@@ -447,13 +447,6 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate }) 
         {isTyping && <TypingIndicator />}
       </div>
 
-      <BottomNav
-        active="plans"
-        onFriends={() => { if (onNavigate) onNavigate('friends'); }}
-        onPlans={() => {}}
-        onComingUp={() => { if (onNavigate) onNavigate('comingup'); }}
-      />
-
       {/* ── Input bar ── */}
       <div className="agent-input-bar">
         <input
@@ -472,6 +465,13 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate }) 
           </svg>
         </button>
       </div>
+
+      <BottomNav
+        active="plans"
+        onFriends={() => { if (onNavigate) onNavigate('friends'); }}
+        onPlans={() => {}}
+        onComingUp={() => { if (onNavigate) onNavigate('comingup'); }}
+      />
     </div>
   );
 }
