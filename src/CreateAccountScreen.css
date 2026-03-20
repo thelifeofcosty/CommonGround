@@ -1,0 +1,351 @@
+/* ── Shell ───────────────────────────────────────────── */
+.ca {
+  flex: 1;
+  min-height: 844px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  animation: screen-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Header ──────────────────────────────────────────── */
+.ca__header {
+  padding: 56px 28px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ca__header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ca__mark {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.ca__back {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  font-family: inherit;
+}
+
+.ca__step-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--taupe);
+}
+
+.ca__progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--taupe-light);
+  border-radius: 99px;
+  overflow: hidden;
+  border: 1px solid var(--taupe);
+}
+
+.ca__progress-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+/* ── Step container ──────────────────────────────────── */
+.ca__step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 28px 0;
+}
+
+.ca__step-header {
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ca__title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1A1A1A;
+  letter-spacing: -0.5px;
+}
+
+.ca__sub {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ── Fields ──────────────────────────────────────────── */
+.ca__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ca-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ca-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a4440;
+}
+
+.ca-field__optional {
+  font-weight: 400;
+  color: var(--taupe);
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.ca-field__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ca-field__toggle {
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+.ca-field input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1.5px solid var(--taupe);
+  background: #fff;
+  font-size: 16px;
+  color: #1A1A1A;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  font-family: inherit;
+}
+
+.ca-field input::placeholder {
+  color: #bbb;
+}
+
+.ca-field input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(175, 206, 101, 0.18);
+}
+
+/* ── Password strength ───────────────────────────────── */
+.strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.strength__bars {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.strength__bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 99px;
+  transition: background 0.25s ease;
+}
+
+.strength__label {
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 52px;
+  text-align: right;
+  transition: color 0.25s;
+}
+
+/* ── Permissions ─────────────────────────────────────── */
+.ca__perms {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.perm-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1.5px solid var(--taupe-light);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.perm-section__title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 10px 16px 8px;
+  background: var(--taupe-light);
+}
+
+.perm-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #fff;
+  cursor: pointer;
+  border-top: 1px solid var(--taupe-light);
+  user-select: none;
+}
+
+.perm-row:first-of-type {
+  border-top: none;
+}
+
+.perm-row__text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.perm-row__label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.perm-row__sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.perm-row__link {
+  color: var(--purple);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Toggle */
+.toggle {
+  width: 48px;
+  height: 28px;
+  border-radius: 99px;
+  background: #ddd;
+  position: relative;
+  transition: background 0.22s ease;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.toggle--on {
+  background: var(--green);
+}
+
+.toggle__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.toggle--on .toggle__thumb {
+  transform: translateX(20px);
+}
+
+/* Checkbox */
+.checkbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  border: 2px solid var(--taupe);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+}
+
+.checkbox--checked {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+/* ── Footer ──────────────────────────────────────────── */
+.ca__footer {
+  padding: 20px 0 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.ca__btn {
+  width: 100%;
+  padding: 17px;
+  border-radius: var(--radius-pill);
+  border: none;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--taupe);
+  color: #fff;
+  opacity: 0.45;
+  font-family: inherit;
+}
+
+.ca__btn--active {
+  background: var(--green);
+  opacity: 1;
+  box-shadow: 0 6px 20px rgba(175, 206, 101, 0.4);
+}
+
+.ca__btn--active:hover {
+  background: #9fbe55;
+  transform: translateY(-1px);
+}
+
+.ca__btn--active:active {
+  transform: translateY(0);
+}
+
+.ca__terms-note {
+  font-size: 12px;
+  color: var(--taupe);
+  text-align: center;
+}

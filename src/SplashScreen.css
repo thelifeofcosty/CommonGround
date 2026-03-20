@@ -1,0 +1,40 @@
+.splash {
+  flex: 1;
+  min-height: 844px;
+  background: var(--taupe);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  opacity: 1;
+  transition: opacity 1s ease;
+}
+
+.splash--fading {
+  opacity: 0;
+}
+
+.splash__logo {
+  width: 240px;
+  object-fit: contain;
+  animation: splash-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.splash__tagline {
+  font-size: 15px;
+  color: #4a4440;
+  letter-spacing: 0.02em;
+  animation: splash-rise 1.1s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes splash-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,457 @@
+/* ── Shell ───────────────────────────────────────────── */
+.ob-screen {
+  flex: 1;
+  min-height: 844px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  animation: screen-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Progress header ─────────────────────────────────── */
+.ob-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 56px 24px 20px;
+  flex-shrink: 0;
+}
+
+.ob-back {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  line-height: 1;
+  width: 32px;
+}
+
+.ob-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.ob-step-track {
+  display: flex;
+  align-items: center;
+}
+
+.ob-step-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--taupe);
+  background: #fff;
+  color: var(--taupe);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.ob-step-dot--active {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(175, 206, 101, 0.4);
+}
+
+.ob-step-dot--done {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+}
+
+.ob-step-line {
+  width: 36px;
+  height: 2px;
+  background: var(--taupe-light);
+  border: 1px solid var(--taupe);
+  border-radius: 99px;
+  margin: 0 4px;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.ob-step-line--done {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+/* ── Scrollable body ─────────────────────────────────── */
+.ob-body {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Step container ──────────────────────────────────── */
+.ob-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 4px 24px 0;
+  animation: screen-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ob-step__head {
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ob-step__logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  margin-bottom: 6px;
+}
+
+.ob-step__title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1A1A1A;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.ob-step__sub {
+  font-size: 15px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── Fields (step 1) ─────────────────────────────────── */
+.ob-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ob-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ob-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a4440;
+}
+
+.ob-field__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ob-field__toggle {
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+.ob-field input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1.5px solid var(--taupe);
+  background: #fff;
+  font-size: 16px;
+  color: #1A1A1A;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.ob-field input::placeholder { color: #bbb; }
+
+.ob-field input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(175, 206, 101, 0.18);
+}
+
+/* ── Calendar grid (step 2) ──────────────────────────── */
+.ob-cal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.ob-cal-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 22px 12px 18px;
+  border-radius: 20px;
+  border: 2px solid var(--taupe-light);
+  background: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  position: relative;
+  transition: all 0.18s ease;
+}
+
+.ob-cal-tile:hover {
+  border-color: var(--orange);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 153, 51, 0.15);
+}
+
+.ob-cal-tile--selected {
+  border-color: var(--orange) !important;
+  background: #fff8f0;
+  box-shadow: 0 4px 16px rgba(255, 153, 51, 0.18);
+}
+
+.ob-cal-tile__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ob-cal-tile__label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.ob-cal-tile__check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--orange);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ── Sections (step 3) ───────────────────────────────── */
+.ob-section {
+  margin-bottom: 24px;
+}
+
+.ob-section__label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin: 0 0 12px;
+}
+
+/* Interest pills */
+.ob-pills-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.ob-pill {
+  padding: 10px 18px;
+  border-radius: 99px;
+  border: 1.5px solid var(--taupe);
+  background: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1A1A1A;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.16s ease;
+  white-space: nowrap;
+}
+
+.ob-pill--sm {
+  padding: 7px 14px;
+  font-size: 13px;
+}
+
+.ob-pill:hover { border-color: var(--green); background: #f4fae6; }
+
+.ob-pill--selected {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(175, 206, 101, 0.3);
+}
+
+/* Budget row */
+.ob-budget-row {
+  display: flex;
+  gap: 10px;
+}
+
+.ob-budget {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 8px;
+  border-radius: 14px;
+  border: 1.5px solid var(--taupe-light);
+  background: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.18s ease;
+}
+
+.ob-budget:hover { border-color: var(--orange); }
+
+.ob-budget--selected {
+  border-color: var(--orange);
+  background: #FF9933;
+  box-shadow: 0 4px 14px rgba(255, 153, 51, 0.3);
+}
+
+.ob-budget__amount {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1A1A1A;
+  transition: color 0.16s;
+}
+
+.ob-budget--selected .ob-budget__amount { color: #fff; }
+
+.ob-budget__sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  transition: color 0.16s;
+}
+
+.ob-budget--selected .ob-budget__sub { color: rgba(255,255,255,0.85); }
+
+/* Dietary toggle */
+.ob-dietary-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: #fff;
+  border-radius: 14px;
+  border: 1.5px solid var(--taupe-light);
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.ob-dietary-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 2px 0 0;
+}
+
+.ob-dietary-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  animation: screen-in 0.3s ease both;
+}
+
+/* Toggle */
+.ob-toggle {
+  width: 46px;
+  height: 26px;
+  border-radius: 99px;
+  background: #ddd;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.22s ease;
+  cursor: pointer;
+}
+
+.ob-toggle--on { background: var(--green); }
+
+.ob-toggle__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ob-toggle--on .ob-toggle__thumb { transform: translateX(20px); }
+
+/* ── Buttons ──────────────────────────────────────────── */
+.ob-footer {
+  padding: 24px 0 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.ob-btn {
+  width: 100%;
+  padding: 17px;
+  border-radius: var(--radius-pill);
+  border: none;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  background: var(--taupe);
+  color: #fff;
+  opacity: 0.45;
+}
+
+.ob-btn--active { opacity: 1; }
+
+.ob-btn--green.ob-btn--active {
+  background: var(--green);
+  box-shadow: 0 6px 20px rgba(175, 206, 101, 0.4);
+}
+
+.ob-btn--green.ob-btn--active:hover { background: #9fbe55; transform: translateY(-1px); }
+.ob-btn--green.ob-btn--active:active { transform: translateY(0); }
+
+.ob-btn--orange.ob-btn--active {
+  background: var(--orange);
+  box-shadow: 0 6px 20px rgba(255, 153, 51, 0.35);
+}
+
+.ob-btn--orange.ob-btn--active:hover { background: #e6891e; transform: translateY(-1px); }
+.ob-btn--orange.ob-btn--active:active { transform: translateY(0); }
+
+.ob-skip {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+  padding: 4px;
+}
+
+.ob-skip:hover { color: #1A1A1A; }

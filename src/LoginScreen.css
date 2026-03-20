@@ -1,0 +1,227 @@
+.login {
+  flex: 1;
+  min-height: 844px;
+  display: flex;
+  flex-direction: column;
+  padding: 60px 28px 40px;
+  gap: 24px;
+  animation: screen-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes screen-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header ──────────────────────────────────────────── */
+.login__header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.login__mark {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  margin-bottom: 4px;
+}
+
+.login__title {
+  font-size: 30px;
+  font-weight: 800;
+  color: #1A1A1A;
+  letter-spacing: -0.5px;
+}
+
+.login__sub {
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+/* ── Form ────────────────────────────────────────────── */
+.login__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.field__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a4440;
+  letter-spacing: 0.01em;
+}
+
+.field__input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1.5px solid var(--taupe);
+  background: #fff;
+  font-size: 16px;
+  color: #1A1A1A;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  font-family: inherit;
+}
+
+.field__input::placeholder {
+  color: #bbb;
+}
+
+.field__input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(175, 206, 101, 0.18);
+}
+
+.field__toggle {
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+.field__toggle:hover {
+  color: #1A1A1A;
+}
+
+.forgot-link {
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  text-align: right;
+  font-family: inherit;
+  margin-top: -4px;
+  align-self: flex-end;
+}
+
+.forgot-link:hover {
+  color: #1A1A1A;
+}
+
+.login__btn {
+  width: 100%;
+  padding: 17px;
+  border-radius: var(--radius-pill);
+  border: none;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--taupe);
+  color: #fff;
+  opacity: 0.5;
+  margin-top: 4px;
+  font-family: inherit;
+}
+
+.login__btn--active {
+  background: var(--green);
+  opacity: 1;
+  box-shadow: 0 6px 20px rgba(175, 206, 101, 0.4);
+}
+
+.login__btn--active:hover {
+  background: #9fbe55;
+  transform: translateY(-1px);
+}
+
+.login__btn--active:active {
+  transform: translateY(0);
+}
+
+/* ── Divider ─────────────────────────────────────────── */
+.login__divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.login__divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--taupe-light);
+  border: none;
+  display: block;
+  border-top: 1px solid var(--taupe);
+  opacity: 0.6;
+}
+
+.login__divider-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+/* ── SSO ─────────────────────────────────────────────── */
+.login__sso {
+  display: flex;
+  gap: 12px;
+}
+
+.sso-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--taupe);
+  background: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1A1A1A;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.sso-btn:hover {
+  border-color: #999;
+  background: #fafafa;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.sso-btn:active {
+  transform: translateY(0);
+}
+
+/* ── Sign-up link ────────────────────────────────────── */
+.login__signup {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: auto;
+}
+
+.login__signup span {
+  color: #1A1A1A;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

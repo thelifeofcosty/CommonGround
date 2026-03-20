@@ -1,0 +1,200 @@
+.home {
+  flex: 1;
+  min-height: 844px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  animation: screen-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Body ────────────────────────────────────────────── */
+.home__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 60px 24px 24px;
+  gap: 28px;
+  overflow-y: auto;
+}
+
+/* ── Topbar ──────────────────────────────────────────── */
+.home__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.home__spacer {
+  flex: 1;
+}
+
+.home__free-pill {
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+  box-shadow: 0 4px 14px rgba(255, 153, 51, 0.35);
+  letter-spacing: 0.01em;
+}
+
+.home__free-pill:hover {
+  background: #e6891e;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(255, 153, 51, 0.4);
+}
+
+.home__free-pill:active {
+  transform: translateY(0);
+}
+
+/* ── Greeting ────────────────────────────────────────── */
+.home__greeting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.home__heading {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1A1A1A;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.home__subheading {
+  font-size: 16px;
+  color: #9a9490;
+  font-weight: 400;
+  margin: 0;
+}
+
+/* ── Chat input ──────────────────────────────────────── */
+.home__input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1.5px solid var(--taupe);
+  border-radius: 99px;
+  padding: 6px 6px 6px 20px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.home__input-wrap:focus-within {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(175, 206, 101, 0.18);
+}
+
+.home__input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #1A1A1A;
+  background: transparent;
+  font-family: inherit;
+}
+
+.home__input::placeholder {
+  color: #bbb;
+}
+
+.home__send {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+}
+
+.home__send--active {
+  background: var(--green);
+  box-shadow: 0 4px 12px rgba(175, 206, 101, 0.4);
+}
+
+.home__send--active:hover {
+  background: #9fbe55;
+  transform: scale(1.06);
+}
+
+/* ── Nudge card ──────────────────────────────────────── */
+.home__nudge {
+  background: var(--taupe-light);
+  border: 1.5px solid var(--taupe);
+  border-radius: 20px;
+  padding: 18px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.home__nudge-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--purple), #cc99cc);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.home__nudge-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.home__nudge-text {
+  font-size: 14px;
+  color: #4a4440;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.home__nudge-text strong {
+  color: #1A1A1A;
+  font-weight: 700;
+}
+
+.home__nudge-cta {
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  align-self: flex-start;
+  transition: all 0.18s ease;
+  box-shadow: 0 3px 10px rgba(175, 206, 101, 0.35);
+}
+
+.home__nudge-cta:hover {
+  background: #9fbe55;
+  transform: translateY(-1px);
+}
+
