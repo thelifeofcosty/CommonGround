@@ -70,7 +70,7 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate 
         active={activeTab}
         onFriends={() => { setActiveTab('friends'); if (onNavigate) onNavigate('friends'); }}
         onPlans={() => { setActiveTab('plans'); launchAgent(null); }}
-        onComingUp={() => setActiveTab('comingup')}
+        onComingUp={() => { setActiveTab('comingup'); if (onNavigate) onNavigate('comingup'); }}
       />
     </div>
   );

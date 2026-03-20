@@ -7,6 +7,7 @@ import OnboardingScreen from './OnboardingScreen';
 import HomeScreen from './HomeScreen';
 import AgentChatScreen from './AgentChatScreen';
 import FriendsScreen from './FriendsScreen';
+import ComingUpScreen from './ComingUpScreen';
 
 function App() {
   const [screen, setScreen] = useState('splash');
@@ -59,6 +60,12 @@ function App() {
         {screen === 'friends' && (
           <FriendsScreen
             onBack={() => setScreen('home')}
+            onNavigate={setScreen}
+            onOpenAgent={openAgent}
+          />
+        )}
+        {screen === 'comingup' && (
+          <ComingUpScreen
             onNavigate={setScreen}
             onOpenAgent={openAgent}
           />
