@@ -537,7 +537,7 @@ export default function FriendsScreen({ onBack, onNavigate, onOpenAgent }) {
       <BottomNav
         active="friends"
         onFriends={() => {}}
-        onPlans={() => { if (onOpenAgent) onOpenAgent(null); }}
+        onPlans={() => { if (onNavigate) onNavigate('home'); }}
         onComingUp={() => { if (onNavigate) onNavigate('comingup'); }}
       />
     </div>

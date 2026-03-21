@@ -137,7 +137,7 @@ export default function ComingUpScreen({ onNavigate, onOpenAgent }) {
       <BottomNav
         active="comingup"
         onFriends={() => onNavigate && onNavigate('friends')}
-        onPlans={() => onOpenAgent && onOpenAgent(null)}
+        onPlans={() => onNavigate && onNavigate('home')}
         onComingUp={() => {}}
       />
     </div>
