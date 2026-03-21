@@ -1,0 +1,360 @@
+.settings {
+  flex: 1;
+  min-height: 844px;
+  display: flex;
+  flex-direction: column;
+  background: #f0ece7;
+  animation: screen-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Header ──────────────────────────────────────────── */
+.settings__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 54px 20px 14px;
+  background: #fff;
+  border-bottom: 1px solid #ede9e4;
+}
+
+.settings__back {
+  width: 38px;
+  height: 38px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.15s ease;
+  padding: 0;
+}
+
+.settings__back:hover {
+  background: #f0ece7;
+}
+
+.settings__logo {
+  height: 28px;
+  object-fit: contain;
+}
+
+/* ── Body ────────────────────────────────────────────── */
+.settings__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ── Section label ───────────────────────────────────── */
+.settings__section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9a9490;
+  padding: 14px 4px 6px;
+}
+
+/* ── Card ────────────────────────────────────────────── */
+.settings__card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #ede9e4;
+}
+
+.settings__divider {
+  height: 1px;
+  background: #f0ece7;
+  margin: 0 16px;
+}
+
+/* ── Row types ───────────────────────────────────────── */
+.settings__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  min-height: 50px;
+}
+
+.settings__row-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+}
+
+.settings__row-label {
+  font-size: 15px;
+  color: #1A1A1A;
+  flex: 1;
+}
+
+.settings__row-label--flex {
+  flex: 1;
+}
+
+.settings__row-value {
+  font-size: 15px;
+  color: #9a9490;
+}
+
+.settings__text-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #AFCE65;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.settings__text-btn--red {
+  color: #e05050;
+}
+
+.settings__text-btn--green {
+  color: #AFCE65;
+  font-size: 15px;
+}
+
+/* ── Profile row ─────────────────────────────────────── */
+.settings__profile-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 16px 16px;
+}
+
+.settings__avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.settings__avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #AFCE65;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings__avatar-edit {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1.5px solid #ede9e4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.settings__profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.settings__profile-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.settings__profile-email {
+  font-size: 14px;
+  color: #9a9490;
+}
+
+.settings__name-input {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1A1A1A;
+  border: none;
+  border-bottom: 2px solid #AFCE65;
+  outline: none;
+  font-family: inherit;
+  background: transparent;
+  width: 180px;
+}
+
+/* ── Pills ───────────────────────────────────────────── */
+.settings__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.settings__pills--indent {
+  padding: 0 16px 14px;
+}
+
+.settings__pill {
+  background: #f0ece7;
+  color: #6a6460;
+  border: 1.5px solid transparent;
+  border-radius: 99px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.settings__pill--on {
+  background: rgba(175, 206, 101, 0.15);
+  border-color: #AFCE65;
+  color: #7aad2a;
+}
+
+/* ── Budget selector ─────────────────────────────────── */
+.settings__budget-group {
+  display: flex;
+  gap: 6px;
+}
+
+.settings__budget-btn {
+  background: #f0ece7;
+  color: #6a6460;
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.settings__budget-btn--on {
+  background: rgba(175, 206, 101, 0.15);
+  border-color: #AFCE65;
+  color: #7aad2a;
+}
+
+/* ── Calendar emoji ──────────────────────────────────── */
+.settings__cal-emoji {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+/* ── Segmented control ───────────────────────────────── */
+.settings__seg {
+  display: flex;
+  background: #f0ece7;
+  border-radius: 10px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.settings__seg-btn {
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #9a9490;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.settings__seg-btn--on {
+  background: #fff;
+  color: #1A1A1A;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* ── Checkboxes ──────────────────────────────────────── */
+.settings__check-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.settings__checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #AFCE65;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.settings__check-label {
+  font-size: 14px;
+  color: #4a4440;
+}
+
+/* ── Toggle switch ───────────────────────────────────── */
+.settings__toggle {
+  width: 46px;
+  height: 26px;
+  border-radius: 99px;
+  background: #ddd;
+  border: none;
+  cursor: pointer;
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.settings__toggle--on {
+  background: #AFCE65;
+}
+
+.settings__toggle-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease;
+  display: block;
+}
+
+.settings__toggle--on .settings__toggle-thumb {
+  transform: translateX(20px);
+}
+
+/* ── Danger buttons ──────────────────────────────────── */
+.settings__danger-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.settings__danger-btn--orange {
+  color: #FF9933;
+}
+
+.settings__danger-btn--red {
+  color: #e05050;
+}

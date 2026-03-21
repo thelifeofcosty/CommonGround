@@ -8,6 +8,7 @@ import HomeScreen from './HomeScreen';
 import AgentChatScreen from './AgentChatScreen';
 import FriendsScreen from './FriendsScreen';
 import ComingUpScreen from './ComingUpScreen';
+import SettingsScreen from './SettingsScreen';
 
 function App() {
   const [screen, setScreen] = useState('splash');
@@ -68,6 +69,13 @@ function App() {
           <ComingUpScreen
             onNavigate={setScreen}
             onOpenAgent={openAgent}
+          />
+        )}
+        {screen === 'settings' && (
+          <SettingsScreen
+            onBack={() => setScreen('home')}
+            userName={userData.name || userData.displayName || 'Rose'}
+            userEmail={userData.email || 'rose@example.com'}
           />
         )}
       </div>

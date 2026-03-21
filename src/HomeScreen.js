@@ -25,8 +25,11 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate 
       <div className="home__body">
 
         <div className="home__topbar">
-          <div className="home__spacer" />
           <button className="home__free-pill">⚡ Who's free now?</button>
+          <div className="home__spacer" />
+          <button className="home__profile-avatar" onClick={() => onNavigate && onNavigate('settings')}>
+            {firstName[0]}
+          </button>
         </div>
 
         <div className="home__greeting">
