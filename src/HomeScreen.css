@@ -101,6 +101,7 @@
   color: #9a9490;
   font-weight: 400;
   margin: 0;
+  font-family: 'Big Caslon', serif;
 }
 
 /* ── Chat input ──────────────────────────────────────── */
@@ -195,6 +196,7 @@
   color: #4a4440;
   line-height: 1.5;
   margin: 0;
+  font-family: 'Big Caslon', serif;
 }
 
 .home__nudge-text strong {

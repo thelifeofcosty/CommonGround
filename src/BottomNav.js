@@ -28,8 +28,8 @@ export default function BottomNav({ active, onFriends, onPlans, onComingUp }) {
   return (
     <div className="bnav">
       <button className="bnav__tab" onClick={onFriends}>
-        <PeopleIcon color={active === 'friends' ? '#996699' : '#C9C1B5'} />
-        <span style={{ color: active === 'friends' ? '#996699' : '#C9C1B5' }}>Friends</span>
+        <PeopleIcon color={active === 'friends' ? '#996699' : '#6B6460'} />
+        <span style={{ color: active === 'friends' ? '#996699' : '#6B6460' }}>Friends</span>
       </button>
 
       <div className="bnav__fab-wrap">
@@ -41,14 +41,14 @@ export default function BottomNav({ active, onFriends, onPlans, onComingUp }) {
             <path d="M12 5v14M5 12h14" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
           </svg>
         </button>
-        <span className="bnav__fab-label" style={{ color: active === 'plans' ? '#AFCE65' : '#C9C1B5' }}>
+        <span className="bnav__fab-label" style={{ color: active === 'plans' ? '#AFCE65' : '#6B6460' }}>
           Plans
         </span>
       </div>
 
       <button className="bnav__tab" onClick={onComingUp}>
-        <CalendarIcon color={active === 'comingup' ? '#FF9933' : '#C9C1B5'} />
-        <span style={{ color: active === 'comingup' ? '#FF9933' : '#C9C1B5' }}>Coming Up</span>
+        <CalendarIcon color={active === 'comingup' ? '#FF9933' : '#6B6460'} />
+        <span style={{ color: active === 'comingup' ? '#FF9933' : '#6B6460' }}>Coming Up</span>
       </button>
     </div>
   );

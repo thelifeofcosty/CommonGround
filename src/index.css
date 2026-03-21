@@ -7,3 +7,24 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+@font-face {
+  font-family: 'Myriad';
+  src: url('./Fonts/MYRIADPRO-REGULAR.OTF');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'Myriad';
+  src: url('./Fonts/MYRIADPRO-BOLD.OTF');
+  font-weight: 700;
+}
+@font-face {
+  font-family: 'Big Caslon';
+  src: url('./Fonts/BigCaslon-Regular.otf');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'Big Caslon';
+  src: url('./Fonts/BigCaslon-Bold.otf');
+  font-weight: 700;
+}

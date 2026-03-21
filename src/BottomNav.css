@@ -1,12 +1,13 @@
 .bnav {
   height: 84px;
-  background: #fff;
-  border-top: 1px solid var(--taupe-light);
+  background: #f8f8f5;
+  border-top: 2px solid var(--taupe);
   display: flex;
   align-items: center;
   justify-content: space-around;
   padding: 0 16px 8px;
   flex-shrink: 0;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
 }
 
 .bnav__tab {
@@ -64,7 +65,7 @@
 .bnav__fab--active { background: #9fbe55; }
 
 .bnav__fab-label {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   transition: color 0.18s ease;
 }
