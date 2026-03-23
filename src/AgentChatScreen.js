@@ -92,36 +92,78 @@ function AvailabilityCard({ onSelect, locked }) {
 // ── Options card ──────────────────────────────────────
 function OptionsCard({ onSelect, locked }) {
   const [selected, setSelected] = useState(null);
+  const [customVenue, setCustomVenue] = useState('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
   const opts = [
     { id: 'a', emoji: '🍝', name: "Carmine's Italian", meta: 'Italian · $$ · 0.8 mi', tag: 'Top pick for groups' },
     { id: 'b', emoji: '🍣', name: 'Sushi Palace',      meta: 'Japanese · $$$ · 1.2 mi', tag: "Matches Jamie's taste" },
     { id: 'c', emoji: '🍕', name: 'The Wood House',    meta: 'Pizza · $ · 0.3 mi', tag: 'Closest & accessible' },
+    { id: 'other', emoji: '🏠', name: 'Other', meta: 'Choose your own place', tag: 'Custom choice' },
   ];
+
+  const handleCustomSubmit = () => {
+    if (customVenue.trim() && !locked) {
+      onSelect({
+        id: 'custom',
+        name: customVenue.trim(),
+        emoji: '🎯',
+        meta: 'Your choice · Custom',
+        tag: 'Personal pick'
+      });
+      setSelected('other');
+    }
+  };
 
   return (
     <div className="options-card">
       <p className="options-card__title">✨ Picks for your group</p>
       {opts.map(opt => (
-        <button
-          key={opt.id}
-          disabled={locked}
-          className={['option-row', selected === opt.id ? 'option-row--selected' : ''].join(' ')}
-          onClick={() => {
-            if (locked) return;
-            setSelected(opt.id);
-            onSelect(opt);
-          }}
-        >
-          <span className="option-emoji">{opt.emoji}</span>
-          <div className="option-info">
-            <span className="option-name">{opt.name}</span>
-            <span className="option-meta">{opt.meta}</span>
-            <span className="option-tag">{opt.tag}</span>
-          </div>
-          <div className={['option-check', selected === opt.id ? 'option-check--on' : ''].join(' ')}>
-            {selected === opt.id ? '✓' : ''}
-          </div>
-        </button>
+        <div key={opt.id}>
+          <button
+            disabled={locked}
+            className={['option-row', selected === opt.id ? 'option-row--selected' : ''].join(' ')}
+            onClick={() => {
+              if (locked) return;
+              if (opt.id === 'other') {
+                setSelected(opt.id);
+                setShowCustomInput(true);
+              } else {
+                setSelected(opt.id);
+                setShowCustomInput(false);
+                onSelect(opt);
+              }
+            }}
+          >
+            <span className="option-emoji">{opt.emoji}</span>
+            <div className="option-info">
+              <span className="option-name">{opt.name}</span>
+              <span className="option-meta">{opt.meta}</span>
+              <span className="option-tag">{opt.tag}</span>
+            </div>
+            <div className={['option-check', selected === opt.id ? 'option-check--on' : ''].join(' ')}>
+              {selected === opt.id ? '✓' : ''}
+            </div>
+          </button>
+          {opt.id === 'other' && showCustomInput && (
+            <div className="custom-venue-input">
+              <input
+                type="text"
+                placeholder="Enter venue name..."
+                value={customVenue}
+                onChange={(e) => setCustomVenue(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleCustomSubmit()}
+                disabled={locked}
+              />
+              <button
+                className={['custom-venue-submit', customVenue.trim() ? 'custom-venue-submit--active' : ''].join(' ')}
+                onClick={handleCustomSubmit}
+                disabled={!customVenue.trim() || locked}
+              >
+                ✓
+              </button>
+            </div>
+          )}
+        </div>
       ))}
     </div>
   );
@@ -277,9 +319,10 @@ function MessageRow({ msg, onSlotSelect, onVenueSelect, onQuickReply,
 }
 
 // ── Main screen ───────────────────────────────────────
-export default function AgentChatScreen({ initialMessage, onBack, onNavigate }) {
-  const [messages, setMessages]   = useState([]);
-  const [isTyping, setIsTyping]   = useState(false);
+export default function AgentChatScreen({ initialMessage, onBack, onNavigate, onSaveDraft, onDeleteCurrentDraft, drafts, draftData }) {
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
   const [inputText, setInputText] = useState('');
   const [step, setStep]           = useState('idle');
   const stepRef    = useRef('idle');
@@ -318,19 +361,27 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate }) 
     if (startedRef.current) return;
     startedRef.current = true;
 
-    const first = initialMessage || 'Plan a dinner with Jamie, Alex and Sam this weekend';
-    addMsg({ type: 'user', text: first });
-    setStep('checking');
-
-    (async () => {
-      await agentSay(400, { text: "On it! Checking when Jamie, Alex, and Sam are all free this weekend... 🔍" });
-      await agentSay(600, {
-        text: "Found it! Here's everyone's availability — tap a slot to pick your window:",
-        cardType: 'availability',
-      });
+    if (draftData) {
+      // Restore from draft
+      setMessages(draftData.messages || []);
+      setStep(draftData.step || 'idle');
+      if (draftData.slot) slotRef.current = draftData.slot;
+      if (draftData.venue) venueRef.current = draftData.venue;
+    } else {
+      // Start new conversation
+      const first = initialMessage || 'Hey, I want to plan something with Jamie, Alex and Sam';
+      addMsg({ type: 'user', text: first });
       setStep('awaiting_slot');
-    })();
-  }, [addMsg, agentSay, initialMessage]);
+
+      (async () => {
+        await agentSay(400, { text: "On it! Checking when Jamie, Alex, and Sam are all free this weekend... 🔍" });
+        await agentSay(600, {
+          text: "Found it! Here's everyone's availability — tap a slot to pick your window:",
+          cardType: 'availability',
+        });
+      })();
+    }
+  }, [addMsg, agentSay, initialMessage, draftData]);
 
   const handleSlotSelect = useCallback((slot) => {
     if (stepRef.current !== 'awaiting_slot') return;
@@ -338,9 +389,22 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate }) 
     setStep('slot_chosen');
     addMsg({ type: 'user', text: `${slot.day} ${slot.time} works for me!` });
 
+    // Auto-determine activity based on time slot
+    let activity;
+    if (slot.time.includes('11 am') || slot.time.includes('2 pm')) {
+      // Lunch time slots
+      activity = { id: 'lunch', name: 'Lunch', emoji: '🥗' };
+    } else if (slot.time.includes('2 – 5 pm')) {
+      // Afternoon slots
+      activity = { id: 'coffee', name: 'Coffee', emoji: '☕' };
+    } else if (slot.time.includes('6 – 9 pm') || slot.time.includes('7 – 10 pm')) {
+      // Evening slots
+      activity = { id: 'dinner', name: 'Dinner', emoji: '🍽️' };
+    }
+
     (async () => {
       await agentSay(300, {
-        text: `${slot.day} evening it is! 🙌 Pulling up options that match everyone's taste...`,
+        text: `${slot.day} ${slot.time.split(' – ')[0]} it is! 🙌 Planning a ${activity.name.toLowerCase()} with Jamie, Alex, and Sam. Pulling up options that match everyone's taste...`,
       });
       await agentSay(700, {
         text: "Here are my top picks — tap one to lock it in:",
@@ -384,6 +448,7 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate }) 
 
     if (reply === "Yes, book it! 🎉") {
       setStep('done');
+      if (draftData) onDeleteCurrentDraft();
       (async () => {
         await agentSay(300, { text: "Booking confirmed and adding to everyone's calendars now... 📅" });
         await agentSay(600, {
@@ -407,14 +472,55 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate }) 
     agentSay(500, { text: "Got it! Let me factor that in..." });
   };
 
-  const lastAgentIdx = messages.reduce((acc, m, i) => (m.type === 'agent' ? i : acc), -1);
+  const handleBack = () => {
+    // Show exit dialog if there's any progress to save (not just initial states)
+    if (step !== 'idle' && step !== 'awaiting_slot') {
+      setShowExitDialog(true);
+    } else {
+      onBack();
+    }
+  };
+
+  const handleSaveDraft = () => {
+    const draftData = {
+      initialMessage: initialMessage || messages.find(m => m.type === 'user')?.text || 'Planning session',
+      messages,
+      step,
+      slot: slotRef.current,
+      venue: venueRef.current,
+      previewText: getPreviewText(),
+      status: getStatusText(),
+    };
+    const draftId = onSaveDraft(draftData);
+    setShowExitDialog(false);
+    onBack();
+  };
+
+  const getPreviewText = () => {
+    if (venueRef.current) {
+      return `Planning ${venueRef.current.name} with the group`;
+    } else if (slotRef.current) {
+      return `Planning ${slotRef.current.day} ${slotRef.current.time}`;
+    }
+    return initialMessage || 'Planning session';
+  };
+
+  const getStatusText = () => {
+    switch (step) {
+      case 'awaiting_rsvp': return 'Awaiting confirmations';
+      case 'awaiting_book': return 'Ready to book';
+      case 'awaiting_venue': return 'Choosing venue';
+      case 'awaiting_slot': return 'Choosing time';
+      default: return 'In progress';
+    }
+  };
 
   return (
     <div className="agent-screen">
 
       {/* ── Header ── */}
       <div className="agent-header">
-        <button className="agent-header__back" onClick={onBack}>←</button>
+        <button className="agent-header__back" onClick={handleBack}>←</button>
         <div className="agent-header__info">
           <img src={logoMark} alt="" className="agent-header__logo" />
           <div>
@@ -431,21 +537,39 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate }) 
       {/* ── Messages ── */}
       <div className="agent-messages" ref={scrollRef}>
         <div className="agent-messages__spacer" />
-        {messages.map((msg, idx) => (
-          <MessageRow
-            key={msg.id}
-            msg={msg}
-            isLatest={idx === lastAgentIdx}
-            onSlotSelect={handleSlotSelect}
-            onVenueSelect={handleVenueSelect}
-            onAllConfirmed={handleAllConfirmed}
-            onQuickReply={handleQuickReply}
-            slotRef={slotRef}
-            venueRef={venueRef}
-          />
-        ))}
+        {(() => {
+          const lastAgentIdx = messages.map((m, i) => m.type === 'agent' ? i : -1).filter(i => i !== -1).pop() || -1;
+          return messages.map((msg, idx) => (
+            <MessageRow
+              key={msg.id}
+              msg={msg}
+              isLatest={idx === lastAgentIdx}
+              onSlotSelect={handleSlotSelect}
+              onVenueSelect={handleVenueSelect}
+              onAllConfirmed={handleAllConfirmed}
+              onQuickReply={handleQuickReply}
+              slotRef={slotRef}
+              venueRef={venueRef}
+            />
+          ));
+        })()}
         {isTyping && <TypingIndicator />}
       </div>
+
+      {/* ── Save while waiting ── */}
+      {step === 'awaiting_rsvp' && (
+        <div className="save-while-waiting">
+          <button className="save-while-waiting__button" onClick={() => {
+            handleSaveDraft();
+            onBack();
+          }}>
+            💾 Save while you wait
+          </button>
+          <p className="save-while-waiting__text">
+            We'll notify you when everyone confirms!
+          </p>
+        </div>
+      )}
 
       {/* ── Input bar ── */}
       <div className="agent-input-bar">
@@ -465,6 +589,26 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate }) 
           </svg>
         </button>
       </div>
+
+      {/* ── Exit Dialog ── */}
+      {showExitDialog && (
+        <div className="exit-dialog-overlay">
+          <div className="exit-dialog">
+            <h3 className="exit-dialog__title">Save as Draft?</h3>
+            <p className="exit-dialog__message">
+              You're in the middle of planning. Save this as a draft to continue later?
+            </p>
+            <div className="exit-dialog__actions">
+              <button className="exit-dialog__cancel" onClick={() => setShowExitDialog(false)}>
+                Don't save
+              </button>
+              <button className="exit-dialog__save" onClick={handleSaveDraft}>
+                Save Draft
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <BottomNav
         active="plans"

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import logoMark from './logo.png';
 import './LoginScreen.css';
 
@@ -6,6 +6,30 @@ export default function LoginScreen({ onLogin, onForgotPassword, onGetStarted })
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  useEffect(() => {
+    // Initialize Google Sign-In
+    window.google?.accounts?.id?.initialize({
+      client_id: '750517705353-n9re6ohilan4rp1for99era10bfmum5h.apps.googleusercontent.com', // Replace with actual client ID
+      callback: handleGoogleSignIn,
+    });
+  }, []);
+
+  const handleGoogleClick = () => {
+    window.google?.accounts?.id?.prompt();
+  };
+
+  const handleGoogleSignIn = (response) => {
+    // Decode the JWT token to get user info
+    const userObject = JSON.parse(atob(response.credential.split('.')[1]));
+    const user = {
+      name: userObject.name,
+      email: userObject.email,
+      picture: userObject.picture,
+      googleId: userObject.sub,
+    };
+    onLogin(user);
+  };
 
   return (
     <div className="login">
@@ -60,7 +84,7 @@ export default function LoginScreen({ onLogin, onForgotPassword, onGetStarted })
         <button
           className={`login__btn ${email && password ? 'login__btn--active' : ''}`}
           disabled={!email || !password}
-          onClick={onLogin}
+          onClick={() => onLogin({ email, password })}
         >
           Log in
         </button>
@@ -73,7 +97,7 @@ export default function LoginScreen({ onLogin, onForgotPassword, onGetStarted })
       </div>
 
       <div className="login__sso">
-        <button className="sso-btn">
+        <button className="sso-btn" onClick={handleGoogleClick}>
           <GoogleIcon />
           Google
         </button>

@@ -14,10 +14,43 @@ function App() {
   const [screen, setScreen] = useState('splash');
   const [userData, setUserData] = useState({});
   const [agentMessage, setAgentMessage] = useState(null);
+  const [currentDraft, setCurrentDraft] = useState(null);
+  const [drafts, setDrafts] = useState([]);
 
   const openAgent = (msg) => {
     setAgentMessage(msg);
+    setCurrentDraft(null);
     setScreen('agent');
+  };
+
+  const saveDraft = (draftData) => {
+    const draft = {
+      id: `draft-${Date.now()}`,
+      ...draftData,
+      savedAt: new Date().toISOString(),
+    };
+    setDrafts(prev => [draft, ...prev]);
+    return draft.id;
+  };
+
+  const loadDraft = (draftId) => {
+    const draft = drafts.find(d => d.id === draftId);
+    if (draft) {
+      setCurrentDraft(draft);
+      setAgentMessage(draft.initialMessage);
+      setScreen('agent');
+    }
+  };
+
+  const deleteCurrentDraft = () => {
+    if (currentDraft) {
+      setDrafts(prev => prev.filter(d => d.id !== currentDraft.id));
+      setCurrentDraft(null);
+    }
+  };
+
+  const deleteDraft = (draftId) => {
+    setDrafts(prev => prev.filter(d => d.id !== draftId));
   };
 
   return (
@@ -28,7 +61,10 @@ function App() {
         )}
         {screen === 'login' && (
           <LoginScreen
-            onLogin={() => setScreen('home')}
+            onLogin={(user) => {
+              setUserData(user);
+              setScreen('home');
+            }}
             onForgotPassword={() => setScreen('forgot-password')}
             onGetStarted={() => setScreen('onboarding')}
           />
@@ -49,6 +85,9 @@ function App() {
             userName={userData.name || userData.displayName || 'Rose'}
             onOpenAgent={openAgent}
             onNavigate={setScreen}
+            drafts={drafts}
+            onLoadDraft={loadDraft}
+            onDeleteDraft={deleteDraft}
           />
         )}
         {screen === 'agent' && (
@@ -56,6 +95,10 @@ function App() {
             initialMessage={agentMessage}
             onBack={() => setScreen('home')}
             onNavigate={setScreen}
+            onSaveDraft={saveDraft}
+            onDeleteCurrentDraft={deleteCurrentDraft}
+            drafts={drafts}
+            draftData={currentDraft}
           />
         )}
         {screen === 'friends' && (

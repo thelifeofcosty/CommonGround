@@ -410,6 +410,59 @@
   border-color: var(--orange);
 }
 
+/* ── Custom venue input ─────────────────────────────── */
+.custom-venue-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  margin-top: 8px;
+  background: #fafafa;
+  border-radius: 12px;
+  border: 1.5px solid var(--taupe-light);
+}
+
+.custom-venue-input input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  color: #1A1A1A;
+  font-family: inherit;
+  outline: none;
+}
+
+.custom-venue-input input::placeholder {
+  color: var(--text-muted);
+}
+
+.custom-venue-submit {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--taupe-light);
+  color: var(--taupe);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.16s ease;
+  font-family: inherit;
+}
+
+.custom-venue-submit--active {
+  background: var(--green);
+  color: #fff;
+}
+
+.custom-venue-submit:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
 /* ── People confirmation card ────────────────────────── */
 .people-confirm-card {
   background: #fff;
@@ -590,6 +643,168 @@
   padding-top: 4px;
 }
 
+/* ── Activity card ───────────────────────────────────── */
+.activity-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.activity-card__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin: 0;
+}
+
+.activity-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.activity-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--taupe-light);
+  background: #fafafa;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: all 0.16s ease;
+  width: 100%;
+}
+
+.activity-option:hover:not(:disabled) {
+  border-color: var(--green);
+  background: #f4fae6;
+}
+
+.activity-option--selected {
+  border-color: var(--green);
+  background: var(--green);
+}
+
+.activity-option--selected .activity-name,
+.activity-option--selected .activity-desc {
+  color: #fff;
+}
+
+.activity-emoji {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.activity-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.activity-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.activity-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.activity-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.2);
+}
+
+/* ── Custom activity card ────────────────────────────── */
+.custom-activity-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.custom-activity-card__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin: 0;
+}
+
+.custom-activity-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.custom-activity-input input {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--taupe-light);
+  background: #fafafa;
+  font-size: 15px;
+  color: #1A1A1A;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.16s ease;
+}
+
+.custom-activity-input input:focus {
+  border-color: var(--green);
+}
+
+.custom-activity-submit {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: var(--taupe-light);
+  color: var(--taupe);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.16s ease;
+  font-family: inherit;
+}
+
+.custom-activity-submit--active {
+  background: var(--green);
+  color: #fff;
+}
+
+.custom-activity-submit:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
 /* ── Input bar ───────────────────────────────────────── */
 .agent-input-bar {
   display: flex;
@@ -650,4 +865,142 @@
 @keyframes msg-in {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Exit Dialog ─────────────────────────────────────── */
+.exit-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fade-in 0.2s ease both;
+}
+
+.exit-dialog {
+  background: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  max-width: 320px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slide-up 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.exit-dialog__title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1A1A1A;
+  margin: 0 0 8px;
+  text-align: center;
+  font-family: 'Big Caslon', serif;
+}
+
+.exit-dialog__message {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0 0 20px;
+  text-align: center;
+}
+
+.exit-dialog__actions {
+  display: flex;
+  gap: 12px;
+}
+
+.exit-dialog__cancel {
+  flex: 1;
+  background: #f5f5f5;
+  color: #666;
+  border: none;
+  border-radius: 99px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.18s ease;
+}
+
+.exit-dialog__cancel:hover {
+  background: #e5e5e5;
+}
+
+.exit-dialog__save {
+  flex: 1;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.18s ease;
+  box-shadow: 0 4px 12px rgba(175, 206, 101, 0.4);
+}
+
+.exit-dialog__save:hover {
+  background: #9fbe55;
+  transform: translateY(-1px);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Save while waiting ──────────────────────────────── */
+.save-while-waiting {
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #fff8f0 0%, #f4fae6 100%);
+  border-top: 1px solid var(--taupe-light);
+  border-bottom: 1px solid var(--taupe-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: msg-in 0.4s ease both;
+}
+
+.save-while-waiting__button {
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.16s ease;
+  font-family: inherit;
+  box-shadow: 0 2px 8px rgba(255, 153, 51, 0.3);
+}
+
+.save-while-waiting__button:hover {
+  background: #e55a00;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 153, 51, 0.4);
+}
+
+.save-while-waiting__text {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+  text-align: center;
 }

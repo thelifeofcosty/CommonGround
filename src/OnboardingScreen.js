@@ -185,14 +185,12 @@ function StepCalendar({ form, set, onNext, onSkip }) {
 
       <div className="ob-footer">
         <button
-          className="ob-btn ob-btn--orange ob-btn--active"
+          className={['ob-btn ob-btn--orange', form.calendars.length > 0 ? 'ob-btn--active' : ''].join(' ')}
+          disabled={form.calendars.length === 0}
           onClick={onNext}
         >
-          {form.calendars.length > 0
-            ? `Connect ${form.calendars.length} calendar${form.calendars.length > 1 ? 's' : ''}`
-            : 'Continue'}
+          Connect {form.calendars.length} calendar{form.calendars.length > 1 ? 's' : ''}
         </button>
-        <button className="ob-skip" onClick={onSkip}>Skip for now</button>
       </div>
     </div>
   );
@@ -330,7 +328,7 @@ export default function OnboardingScreen({ onComplete }) {
 
       <div className="ob-body">
         {step === 1 && <StepAccount    form={form} set={set} onNext={next} />}
-        {step === 2 && <StepCalendar   form={form} set={set} onNext={next} onSkip={next} />}
+        {step === 2 && <StepCalendar   form={form} set={set} onNext={next} />}
         {step === 3 && <StepInterests  form={form} set={set} onFinish={() => onComplete(form)} />}
       </div>
     </div>

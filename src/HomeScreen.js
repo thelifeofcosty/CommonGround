@@ -10,7 +10,7 @@ function SendIcon() {
   );
 }
 
-export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate }) {
+export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate, drafts = [], onLoadDraft, onDeleteDraft }) {
   const [query, setQuery] = useState('');
   const [activeTab, setActiveTab] = useState('plans');
 
@@ -66,6 +66,34 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate 
             <button className="home__nudge-cta">Let's go →</button>
           </div>
         </div>
+
+        {drafts.length > 0 && (
+          <div className="home__drafts">
+            <h3 className="home__drafts-title">📝 Drafts</h3>
+            {drafts.map(draft => (
+              <div key={draft.id} className="home__draft-item">
+                <div className="home__draft-content">
+                  <p className="home__draft-text">{draft.previewText || draft.initialMessage}</p>
+                  <span className="home__draft-status">{draft.status}</span>
+                </div>
+                <div className="home__draft-actions">
+                  <button
+                    className="home__draft-resume"
+                    onClick={() => onLoadDraft && onLoadDraft(draft.id)}
+                  >
+                    Resume
+                  </button>
+                  <button
+                    className="home__draft-delete"
+                    onClick={() => onDeleteDraft && onDeleteDraft(draft.id)}
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
       </div>
 
