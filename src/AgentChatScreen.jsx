@@ -325,6 +325,7 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate, on
   const [isTyping, setIsTyping] = useState(false);
   const [inputText, setInputText] = useState('');
   const [step, setStep]           = useState('idle');
+  const [confirmationsSent, setConfirmationsSent] = useState(false);
   const stepRef    = useRef('idle');
   const slotRef    = useRef(null);
   const venueRef   = useRef(null);
@@ -365,10 +366,12 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate, on
       // Restore from draft
       setMessages(draftData.messages || []);
       setStep(draftData.step || 'idle');
+      setConfirmationsSent(draftData.confirmationsSent || false);
       if (draftData.slot) slotRef.current = draftData.slot;
       if (draftData.venue) venueRef.current = draftData.venue;
     } else {
       // Start new conversation
+      setConfirmationsSent(false);
       const first = initialMessage || 'Hey, I want to plan something with Jamie, Alex and Sam';
       addMsg({ type: 'user', text: first });
       setStep('awaiting_slot');
@@ -425,6 +428,7 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate, on
         text: "Great pick! Before I book, let me send confirmation requests to everyone.",
         cardType: 'people-confirm',
       });
+      setConfirmationsSent(true);
       // onAllConfirmed will fire automatically from the card after all people confirm
     })();
   }, [addMsg, agentSay]);
@@ -437,7 +441,7 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate, on
     (async () => {
       await agentSay(400, {
         text: "Everyone's confirmed! 🎉 Shall I go ahead and book it?",
-        quickReplies: ["Yes, book it! 🎉", "Let me check first"],
+        quickReplies: ["Yes, book!", "Cancel Plan"],
       });
     })();
   }, [agentSay]);
@@ -446,7 +450,7 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate, on
     if (stepRef.current !== 'awaiting_book') return;
     addMsg({ type: 'user', text: reply });
 
-    if (reply === "Yes, book it! 🎉") {
+    if (reply === "Yes, book!") {
       setStep('done');
       if (draftData) onDeleteCurrentDraft();
       (async () => {
@@ -456,13 +460,19 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate, on
           cardType: 'calendar',
         });
       })();
-    } else {
-      agentSay(400, {
-        text: "No problem — take your time. Tap below when you're ready.",
-        quickReplies: ["Book it! 🎉", "Cancel plan"],
-      });
+    } else if (reply === "Cancel Plan") {
+      setStep('cancelled');
+      (async () => {
+        await agentSay(400, {
+          text: "See you next time! 👋",
+          quickReplies: ["End Chat"],
+        });
+      })();
+    } else if (reply === "End Chat") {
+      if (draftData) onDeleteCurrentDraft();
+      onBack();
     }
-  }, [addMsg, agentSay]);
+  }, [addMsg, agentSay, draftData, onDeleteCurrentDraft, onBack]);
 
   const handleSend = () => {
     const text = inputText.trim();
@@ -488,10 +498,11 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate, on
       step,
       slot: slotRef.current,
       venue: venueRef.current,
+      confirmationsSent,
       previewText: getPreviewText(),
       status: getStatusText(),
     };
-    const draftId = onSaveDraft(draftData);
+    onSaveDraft(draftData);
     setShowExitDialog(false);
     onBack();
   };
@@ -511,6 +522,7 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate, on
       case 'awaiting_book': return 'Ready to book';
       case 'awaiting_venue': return 'Choosing venue';
       case 'awaiting_slot': return 'Choosing time';
+      case 'cancelled': return 'Plan cancelled';
       default: return 'In progress';
     }
   };
@@ -557,7 +569,7 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate, on
       </div>
 
       {/* ── Save while waiting ── */}
-      {step === 'awaiting_rsvp' && (
+      {step === 'awaiting_rsvp' && confirmationsSent && (
         <div className="save-while-waiting">
           <button className="save-while-waiting__button" onClick={() => {
             handleSaveDraft();
@@ -599,7 +611,10 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate, on
               You're in the middle of planning. Save this as a draft to continue later?
             </p>
             <div className="exit-dialog__actions">
-              <button className="exit-dialog__cancel" onClick={() => setShowExitDialog(false)}>
+              <button className="exit-dialog__cancel" onClick={() => {
+                setShowExitDialog(false);
+                onBack();
+              }}>
                 Don't save
               </button>
               <button className="exit-dialog__save" onClick={handleSaveDraft}>

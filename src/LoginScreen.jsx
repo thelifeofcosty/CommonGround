@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import logoMark from './logo.png';
 import './LoginScreen.css';
 
@@ -7,19 +7,7 @@ export default function LoginScreen({ onLogin, onForgotPassword, onGetStarted })
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  useEffect(() => {
-    // Initialize Google Sign-In
-    window.google?.accounts?.id?.initialize({
-      client_id: '750517705353-n9re6ohilan4rp1for99era10bfmum5h.apps.googleusercontent.com', // Replace with actual client ID
-      callback: handleGoogleSignIn,
-    });
-  }, []);
-
-  const handleGoogleClick = () => {
-    window.google?.accounts?.id?.prompt();
-  };
-
-  const handleGoogleSignIn = (response) => {
+  const handleGoogleSignIn = useCallback((response) => {
     // Decode the JWT token to get user info
     const userObject = JSON.parse(atob(response.credential.split('.')[1]));
     const user = {
@@ -29,6 +17,18 @@ export default function LoginScreen({ onLogin, onForgotPassword, onGetStarted })
       googleId: userObject.sub,
     };
     onLogin(user);
+  }, [onLogin]);
+
+  useEffect(() => {
+    // Initialize Google Sign-In
+    window.google?.accounts?.id?.initialize({
+      client_id: '750517705353-n9re6ohilan4rp1for99era10bfmum5h.apps.googleusercontent.com', // Replace with actual client ID
+      callback: handleGoogleSignIn,
+    });
+  }, [handleGoogleSignIn]);
+
+  const handleGoogleClick = () => {
+    window.google?.accounts?.id?.prompt();
   };
 
   return (
