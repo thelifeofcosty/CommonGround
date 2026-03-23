@@ -35,9 +35,12 @@
   background: #f0ece7;
 }
 
-.settings__logo {
-  height: 28px;
-  object-fit: contain;
+.settings__title {
+  font-family: 'Big Caslon', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
 }
 
 /* ── Body ────────────────────────────────────────────── */
@@ -206,6 +209,40 @@
 .settings__pills--indent {
   padding: 0 16px 14px;
 }
+
+.settings__other-dietary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 4px;
+  padding: 7px 12px;
+  background: #fafafa;
+  border: 1.5px solid #ddd;
+  border-radius: 12px;
+}
+.settings__other-dietary input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-family: inherit;
+  color: #1A1A1A;
+  outline: none;
+}
+.settings__other-dietary input::placeholder { color: #aaa; }
+.settings__other-dietary button {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: #AFCE65;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.settings__other-dietary button:disabled { background: #ddd; cursor: default; }
 
 .settings__pill {
   background: #f0ece7;

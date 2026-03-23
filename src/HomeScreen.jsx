@@ -16,8 +16,8 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
 
   const firstName = userName.split(' ')[0];
 
-  const launchAgent = (msg) => {
-    if (onOpenAgent) onOpenAgent(msg || null);
+  const launchAgent = (msg, people) => {
+    if (onOpenAgent) onOpenAgent(msg || null, people || null);
   };
 
   return (
@@ -25,7 +25,7 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
       <div className="home__body">
 
         <div className="home__topbar">
-          <button className="home__free-pill">⚡ Who's free now?</button>
+          <button className="home__free-pill" onClick={() => onNavigate && onNavigate('whos-free')}>⚡ Who's free now?</button>
           <div className="home__spacer" />
           <button className="home__profile-avatar" onClick={() => onNavigate && onNavigate('settings')}>
             {firstName[0]}
@@ -57,7 +57,7 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
           </button>
         </div>
 
-        <div className="home__nudge" onClick={() => launchAgent("Plan something with Jamie — it's been 3 weeks!")}>
+        <div className="home__nudge" onClick={() => launchAgent("Plan something with Jamie — it's been 3 weeks!", [{ name: 'Jamie', initial: 'J', color: '#996699' }])}>
           <div className="home__nudge-avatar">J</div>
           <div className="home__nudge-body">
             <p className="home__nudge-text">

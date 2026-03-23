@@ -4,7 +4,8 @@
   min-height: 844px;
   display: flex;
   flex-direction: column;
-  background: #E5DDD5; /* WhatsApp background */
+  background: var(--taupe-light);
+  font-family: 'Myriad', sans-serif;
   animation: screen-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -14,7 +15,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 56px 20px 14px;
-  background: #075E54; /* WhatsApp green */
+  background: var(--purple);
   color: #fff;
   flex-shrink: 0;
 }
@@ -37,6 +38,7 @@
 }
 
 .event-chat__title {
+  font-family: 'Big Caslon', serif;
   font-size: 17px;
   font-weight: 600;
   margin: 0;
@@ -109,7 +111,7 @@
 .event-chat__sender-name {
   font-size: 13px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-muted);
 }
 
 .event-chat__bubble {
@@ -123,24 +125,25 @@
 
 .event-chat__text {
   background: #fff;
-  color: #333;
-  padding: 8px 12px;
-  border-radius: 8px;
+  color: var(--text);
+  padding: 9px 13px;
+  border-radius: 16px 16px 16px 4px;
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 1.45;
   word-wrap: break-word;
-  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
 }
 
 .event-chat__message--me .event-chat__text {
-  background: #DCF8C6; /* WhatsApp light green */
-  color: #333;
+  background: var(--purple);
+  color: #fff;
+  border-radius: 16px 16px 4px 16px;
 }
 
 .event-chat__time {
   font-size: 11px;
-  color: #999;
-  margin-top: 2px;
+  color: var(--text-muted);
+  margin-top: 3px;
   text-align: right;
 }
 
@@ -150,23 +153,28 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px 20px;
-  background: #F0F0F0;
-  border-top: 1px solid #E0E0E0;
+  background: var(--bg);
+  border-top: 1px solid var(--taupe);
 }
 
 .event-chat__input-field {
   flex: 1;
   padding: 10px 16px;
-  border: 1px solid #CCC;
-  border-radius: 20px;
+  border: 1.5px solid var(--taupe);
+  border-radius: var(--radius-pill);
   font-size: 14px;
+  font-family: 'Myriad', sans-serif;
   outline: none;
   background: #fff;
-  font-family: inherit;
+  color: var(--text);
+}
+
+.event-chat__input-field::placeholder {
+  color: var(--text-muted);
 }
 
 .event-chat__input-field:focus {
-  border-color: #25D366;
+  border-color: var(--purple);
 }
 
 .event-chat__send {
@@ -174,7 +182,7 @@
   height: 40px;
   border-radius: 50%;
   border: none;
-  background: #CCC;
+  background: var(--taupe);
   color: #fff;
   font-size: 16px;
   cursor: pointer;
@@ -182,14 +190,15 @@
   align-items: center;
   justify-content: center;
   transition: background 0.2s ease;
+  flex-shrink: 0;
 }
 
 .event-chat__send--active {
-  background: #25D366;
+  background: var(--purple);
 }
 
 .event-chat__send--active:hover {
-  background: #128C7E;
+  background: #7a4d7a;
 }
 
 /* ── Animations ──────────────────────────────────────── */

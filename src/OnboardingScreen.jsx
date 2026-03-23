@@ -214,6 +214,9 @@ const BUDGETS = [
 ];
 
 function StepInterests({ form, set, onFinish }) {
+  const [otherDietaryText, setOtherDietaryText] = useState('');
+  const [showOtherInput, setShowOtherInput] = useState(false);
+
   const toggleInterest = (v) =>
     set('interests', prev =>
       prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v]
@@ -222,6 +225,12 @@ function StepInterests({ form, set, onFinish }) {
     set('dietary', prev =>
       prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v]
     );
+  const confirmOtherDietary = () => {
+    const val = otherDietaryText.trim();
+    if (val && !form.dietary.includes(val)) set('dietary', prev => [...prev, val]);
+    setOtherDietaryText('');
+    setShowOtherInput(false);
+  };
 
   const canFinish = form.interests.length > 0 && form.budget;
 
@@ -285,6 +294,34 @@ function StepInterests({ form, set, onFinish }) {
                 {d}
               </button>
             ))}
+            {form.dietary.filter(d => !DIETARY_OPTIONS.includes(d)).map(d => (
+              <button
+                key={d}
+                className="ob-pill ob-pill--sm ob-pill--selected"
+                onClick={() => toggleDietary(d)}
+              >
+                {d} ✕
+              </button>
+            ))}
+            <button
+              className={['ob-pill ob-pill--sm', showOtherInput ? 'ob-pill--selected' : ''].join(' ')}
+              onClick={() => setShowOtherInput(p => !p)}
+            >
+              + Other
+            </button>
+            {showOtherInput && (
+              <div className="ob-other-dietary">
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="e.g. Low-FODMAP"
+                  value={otherDietaryText}
+                  onChange={e => setOtherDietaryText(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && confirmOtherDietary()}
+                />
+                <button onClick={confirmOtherDietary} disabled={!otherDietaryText.trim()}>✓</button>
+              </div>
+            )}
           </div>
         )}
       </div>

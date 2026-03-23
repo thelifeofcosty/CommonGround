@@ -372,6 +372,40 @@
   animation: screen-in 0.3s ease both;
 }
 
+.ob-other-dietary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px 12px;
+  background: #fafafa;
+  border: 1.5px solid #ddd;
+  border-radius: 12px;
+}
+.ob-other-dietary input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-family: inherit;
+  color: #1A1A1A;
+  outline: none;
+}
+.ob-other-dietary input::placeholder { color: #aaa; }
+.ob-other-dietary button {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: #AFCE65;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.ob-other-dietary button:disabled { background: #ddd; cursor: default; }
+
 /* Toggle */
 .ob-toggle {
   width: 46px;

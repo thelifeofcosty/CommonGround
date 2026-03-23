@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import './SettingsScreen.css';
-import logoFull from './logo-full.png';
 
 const INTERESTS = ['Food & Drinks', 'Outdoors', 'Culture', 'Nightlife', 'Live Music', 'Sports', 'Art', 'Gaming'];
 const DIETARY = ['Vegetarian', 'Vegan', 'Halal', 'Kosher', 'Gluten-free', 'Dairy-free'];
@@ -50,6 +49,8 @@ export default function SettingsScreen({ onBack, userName = 'Rose', userEmail = 
   const [budget, setBudget] = useState('££');
   const [dietary, setDietary] = useState([]);
   const [showDietary, setShowDietary] = useState(false);
+  const [otherDietaryText, setOtherDietaryText] = useState('');
+  const [showOtherDietary, setShowOtherDietary] = useState(false);
   const [accessibility, setAccessibility] = useState(false);
 
   // Calendars
@@ -90,7 +91,7 @@ export default function SettingsScreen({ onBack, userName = 'Rose', userEmail = 
         <button className="settings__back" onClick={onBack}>
           <BackIcon />
         </button>
-        <img src={logoFull} alt="CommonGround" className="settings__logo" />
+        <h1 className="settings__title">Settings</h1>
         <div style={{ width: 38 }} />
       </div>
 
@@ -192,6 +193,43 @@ export default function SettingsScreen({ onBack, userName = 'Rose', userEmail = 
                   onClick={() => toggleDietary(d)}
                 >{d}</button>
               ))}
+              {dietary.filter(d => !DIETARY.includes(d)).map(d => (
+                <button
+                  key={d}
+                  className="settings__pill settings__pill--on"
+                  onClick={() => toggleDietary(d)}
+                >{d} ✕</button>
+              ))}
+              <button
+                className={`settings__pill ${showOtherDietary ? 'settings__pill--on' : ''}`}
+                onClick={() => setShowOtherDietary(p => !p)}
+              >+ Other</button>
+              {showOtherDietary && (
+                <div className="settings__other-dietary">
+                  <input
+                    autoFocus
+                    type="text"
+                    placeholder="e.g. Low-FODMAP"
+                    value={otherDietaryText}
+                    onChange={e => setOtherDietaryText(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && otherDietaryText.trim()) {
+                        if (!dietary.includes(otherDietaryText.trim())) toggleDietary(otherDietaryText.trim());
+                        setOtherDietaryText('');
+                        setShowOtherDietary(false);
+                      }
+                    }}
+                  />
+                  <button
+                    disabled={!otherDietaryText.trim()}
+                    onClick={() => {
+                      if (!dietary.includes(otherDietaryText.trim())) toggleDietary(otherDietaryText.trim());
+                      setOtherDietaryText('');
+                      setShowOtherDietary(false);
+                    }}
+                  >✓</button>
+                </div>
+              )}
             </div>
           )}
 

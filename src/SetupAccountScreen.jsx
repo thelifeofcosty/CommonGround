@@ -173,8 +173,17 @@ function StepInterests({ form, set, onNext }) {
 }
 
 function StepPreferences({ form, set, onNext }) {
+  const [otherDietaryText, setOtherDietaryText] = useState('');
+  const [showOtherInput, setShowOtherInput] = useState(false);
+
   const toggleDietary = (v) => set('dietary', p => p.includes(v) ? p.filter(x => x !== v) : [...p, v]);
   const toggleAccess = (v) => set('accessibility', p => p.includes(v) ? p.filter(x => x !== v) : [...p, v]);
+  const confirmOtherDietary = () => {
+    const val = otherDietaryText.trim();
+    if (val && !form.dietary.includes(val)) set('dietary', p => [...p, val]);
+    setOtherDietaryText('');
+    setShowOtherInput(false);
+  };
 
   return (
     <div className="sa__step sa__step--scroll">
@@ -189,6 +198,23 @@ function StepPreferences({ form, set, onNext }) {
           {DIETARY.map(d => (
             <TagPill key={d} label={d} selected={form.dietary.includes(d)} onClick={() => toggleDietary(d)} />
           ))}
+          {form.dietary.filter(d => !DIETARY.includes(d)).map(d => (
+            <TagPill key={d} label={`${d} ✕`} selected onClick={() => toggleDietary(d)} />
+          ))}
+          <TagPill label="+ Other" selected={showOtherInput} onClick={() => setShowOtherInput(p => !p)} />
+          {showOtherInput && (
+            <div className="sa__other-dietary">
+              <input
+                autoFocus
+                type="text"
+                placeholder="e.g. Low-FODMAP"
+                value={otherDietaryText}
+                onChange={e => setOtherDietaryText(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && confirmOtherDietary()}
+              />
+              <button onClick={confirmOtherDietary} disabled={!otherDietaryText.trim()}>✓</button>
+            </div>
+          )}
         </div>
       </div>
 

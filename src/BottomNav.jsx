@@ -42,7 +42,7 @@ export default function BottomNav({ active, onFriends, onPlans, onComingUp }) {
           </svg>
         </button>
         <span className="bnav__fab-label" style={{ color: active === 'plans' ? '#AFCE65' : '#6B6460' }}>
-          Plans
+          Plan
         </span>
       </div>
 

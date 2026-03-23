@@ -18,7 +18,7 @@ export default function SplashScreen({ onDone }) {
   return (
     <div className={`splash ${fading ? 'splash--fading' : ''}`}>
       <img src={logoFull} alt="CommonGround" className="splash__logo" />
-      <p className="splash__tagline">Where interests become connections.</p>
+      <p className="splash__tagline">From "we should hang out" to "see you Thursday."</p>
     </div>
   );
 }

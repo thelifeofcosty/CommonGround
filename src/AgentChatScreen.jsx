@@ -3,15 +3,24 @@ import logoMark from './logo.png';
 import './AgentChatScreen.css';
 import BottomNav from './BottomNav';
 
-// ── People in the group ───────────────────────────────
-const GROUP = [
+// ── Default group (used when no people prop is passed) ─
+const DEFAULT_GROUP = [
   { name: 'Jamie', initial: 'J', color: '#996699' },
   { name: 'Alex',  initial: 'A', color: '#FF9933' },
   { name: 'Sam',   initial: 'S', color: '#AFCE65' },
 ];
 
+// Format a list of people into a readable string
+function formatNames(people) {
+  if (people.length === 1) return people[0].name;
+  if (people.length === 2) return `${people[0].name} and ${people[1].name}`;
+  return `${people.slice(0, -1).map(p => p.name).join(', ')}, and ${people[people.length - 1].name}`;
+}
+
 // Staggered confirm delays per person (ms after card mounts)
-const CONFIRM_DELAYS = [1600, 2900, 4100];
+function getConfirmDelays(count) {
+  return Array.from({ length: count }, (_, i) => 1600 + i * 1300);
+}
 
 // ── Tiny avatar ───────────────────────────────────────
 function Avatar({ initial, color, size = 32 }) {
@@ -40,39 +49,41 @@ function TypingIndicator() {
 }
 
 // ── Availability card ─────────────────────────────────
-function AvailabilityCard({ onSelect, locked }) {
+function AvailabilityCard({ onSelect, locked, people }) {
   const [selected, setSelected] = useState(null);
-  const slots = [
-    { id: 'sat-pm',  day: 'Saturday', time: '2 – 5 pm',    free: 2, best: false },
-    { id: 'sat-eve', day: 'Saturday', time: '7 – 10 pm',   free: 3, best: true  },
-    { id: 'sun-am',  day: 'Sunday',   time: '11 am – 2 pm', free: 2, best: false },
-    { id: 'sun-eve', day: 'Sunday',   time: '6 – 9 pm',    free: 3, best: false },
-  ];
+
+  const formatDate = date => `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`;
+  const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+  const slots = [];
+  const start = new Date();
+  for (let i = 0; i < 7; i += 1) {
+    const cur = new Date(start);
+    cur.setDate(start.getDate() + i);
+    const dayName = DAYS[cur.getDay()];
+    const dateLabel = `${dayName} ${formatDate(cur)}`;
+
+    const slotTimes = ['10:00 – 12:00', '18:00 – 20:00'];
+    slotTimes.forEach((time, idx) => {
+      const id = `${dayName.toLowerCase().slice(0,3)}-${idx}`;
+      slots.push({ id, day: dateLabel, time, free: people.length });
+    });
+  }
+
+  const availableSlots = slots.slice(0, 4);
 
   return (
     <div className="avail-card">
       <div className="avail-card__header">
-        <span className="avail-card__title">📅 This weekend</span>
-        <span className="avail-card__legend">
-          {GROUP.map((p, i) => (
-            <span key={p.name} className="avail-legend-item">
-              <span className="avail-legend-dot" style={{ background: p.color }} />
-              {p.name}{i < GROUP.length - 1 ? ' · ' : ''}
-            </span>
-          ))}
-        </span>
-        <div className="avail-card__avatars">
-          {GROUP.map(p => <Avatar key={p.name} initial={p.initial} color={p.color} size={22} />)}
-        </div>
+        <span className="avail-card__title">📅 Next week</span>
       </div>
       <div className="avail-grid">
-        {slots.map(slot => (
+        {availableSlots.map(slot => (
           <button
             key={slot.id}
             disabled={locked}
             className={[
               'avail-slot',
-              slot.best ? 'avail-slot--best' : '',
               selected === slot.id ? 'avail-slot--selected' : '',
             ].join(' ')}
             onClick={() => {
@@ -81,13 +92,11 @@ function AvailabilityCard({ onSelect, locked }) {
               onSelect(slot);
             }}
           >
-            {slot.best && <span className="avail-slot__badge">⭐ Best</span>}
             <span className="avail-slot__day">{slot.day}</span>
             <span className="avail-slot__time">{slot.time}</span>
             <div className="avail-slot__dots">
-              {GROUP.map((p, i) => (
-                <span key={p.name} className="avail-dot"
-                  style={{ background: i < slot.free ? p.color : '#ddd' }} />
+              {people.map((p, i) => (
+                <span key={p.name} className="avail-dot" style={{ background: i < slot.free ? p.color : '#ddd' }} />
               ))}
             </div>
           </button>
@@ -178,13 +187,14 @@ function OptionsCard({ onSelect, locked }) {
 }
 
 // ── People confirmation card ──────────────────────────
-function PeopleConfirmCard({ venue, slot, onAllConfirmed }) {
+function PeopleConfirmCard({ venue, slot, onAllConfirmed, people }) {
+  const delays = getConfirmDelays(people.length);
   // statuses: 'sent' | 'confirmed'
-  const [statuses, setStatuses] = useState(GROUP.map(() => 'sent'));
+  const [statuses, setStatuses] = useState(people.map(() => 'sent'));
   const calledBack = useRef(false);
 
   useEffect(() => {
-    const timers = CONFIRM_DELAYS.map((delay, i) =>
+    const timers = delays.map((delay, i) =>
       setTimeout(() => {
         setStatuses(prev => {
           const next = [...prev];
@@ -200,7 +210,7 @@ function PeopleConfirmCard({ venue, slot, onAllConfirmed }) {
         calledBack.current = true;
         onAllConfirmed();
       }
-    }, CONFIRM_DELAYS[CONFIRM_DELAYS.length - 1] + 600);
+    }, delays[delays.length - 1] + 600);
 
     return () => {
       timers.forEach(clearTimeout);
@@ -215,7 +225,7 @@ function PeopleConfirmCard({ venue, slot, onAllConfirmed }) {
     <div className="people-confirm-card">
       <div className="people-confirm-card__header">
         <span className="people-confirm-card__title">
-          {allConfirmed ? "Everyone's in! 🎉" : `Waiting for confirmations… ${confirmedCount}/${GROUP.length}`}
+          {allConfirmed ? "Everyone's in! 🎉" : `Waiting for confirmations… ${confirmedCount}/${people.length}`}
         </span>
         <div className="people-confirm-card__venue">
           {venue?.emoji || '📍'} {venue?.name} · {slot?.day}
@@ -223,7 +233,7 @@ function PeopleConfirmCard({ venue, slot, onAllConfirmed }) {
       </div>
 
       <div className="people-confirm-card__list">
-        {GROUP.map((person, i) => {
+        {people.map((person, i) => {
           const confirmed = statuses[i] === 'confirmed';
           return (
             <div key={person.name} className="confirm-row">
@@ -244,7 +254,7 @@ function PeopleConfirmCard({ venue, slot, onAllConfirmed }) {
 
       {allConfirmed && (
         <div className="people-confirm-card__footer">
-          All 3 people confirmed · Ready to book
+          All {people.length} {people.length === 1 ? 'person' : 'people'} confirmed · Ready to book
         </div>
       )}
     </div>
@@ -252,7 +262,7 @@ function PeopleConfirmCard({ venue, slot, onAllConfirmed }) {
 }
 
 // ── Calendar confirmation card ────────────────────────
-function CalendarCard({ venue, slot }) {
+function CalendarCard({ venue, slot, people }) {
   return (
     <div className="cal-confirm-card">
       <div className="cal-confirm-card__top">
@@ -265,7 +275,7 @@ function CalendarCard({ venue, slot }) {
       </div>
       <div className="cal-confirm-card__divider" />
       <div className="cal-confirm-card__people">
-        {GROUP.map(p => (
+        {people.map(p => (
           <div key={p.name} className="cal-confirm-person">
             <Avatar initial={p.initial} color={p.color} size={30} />
             <span className="cal-confirm-person__name">{p.name}</span>
@@ -273,14 +283,14 @@ function CalendarCard({ venue, slot }) {
           </div>
         ))}
       </div>
-      <p className="cal-confirm-card__note">3 calendars updated · Invites sent</p>
+      <p className="cal-confirm-card__note">{people.length} {people.length === 1 ? 'calendar' : 'calendars'} updated · Invites sent</p>
     </div>
   );
 }
 
 // ── Single message row ────────────────────────────────
 function MessageRow({ msg, onSlotSelect, onVenueSelect, onQuickReply,
-                      onAllConfirmed, slotRef, venueRef, isLatest }) {
+                      onAllConfirmed, slotRef, venueRef, isLatest, people }) {
   if (msg.type === 'user') {
     return (
       <div className="user-row">
@@ -297,7 +307,7 @@ function MessageRow({ msg, onSlotSelect, onVenueSelect, onQuickReply,
       <div className="agent-col">
         {msg.text && <div className="agent-bubble">{msg.text}</div>}
         {msg.cardType === 'availability' && (
-          <AvailabilityCard onSelect={onSlotSelect} locked={!isLatest} />
+          <AvailabilityCard onSelect={onSlotSelect} locked={!isLatest} people={people} />
         )}
         {msg.cardType === 'options' && (
           <OptionsCard onSelect={onVenueSelect} locked={!isLatest} />
@@ -307,10 +317,11 @@ function MessageRow({ msg, onSlotSelect, onVenueSelect, onQuickReply,
             venue={venueRef.current}
             slot={slotRef.current}
             onAllConfirmed={onAllConfirmed}
+            people={people}
           />
         )}
         {msg.cardType === 'calendar' && (
-          <CalendarCard venue={venueRef.current} slot={slotRef.current} />
+          <CalendarCard venue={venueRef.current} slot={slotRef.current} people={people} />
         )}
         {msg.quickReplies && isLatest && (
           <div className="quick-replies">
@@ -327,7 +338,8 @@ function MessageRow({ msg, onSlotSelect, onVenueSelect, onQuickReply,
 }
 
 // ── Main screen ───────────────────────────────────────
-export default function AgentChatScreen({ initialMessage, onBack, onNavigate, onSaveDraft, onDeleteCurrentDraft, drafts, draftData }) {
+export default function AgentChatScreen({ initialMessage, people: peopleProp, onBack, onNavigate, onSaveDraft, onDeleteCurrentDraft, draftData }) {
+  const people = peopleProp || DEFAULT_GROUP;
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -380,19 +392,23 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate, on
     } else {
       // Start new conversation
       setConfirmationsSent(false);
-      const first = initialMessage || 'Hey, I want to plan something with Jamie, Alex and Sam';
+      const first = initialMessage || `Hey, I want to plan something with ${formatNames(people)}`;
       addMsg({ type: 'user', text: first });
       setStep('awaiting_slot');
 
+      const checkingMsg = people.length === 1
+        ? `On it! Checking when ${people[0].name} is free this week... 🔍`
+        : `On it! Checking when ${formatNames(people)} are all free this week... 🔍`;
+
       (async () => {
-        await agentSay(400, { text: "On it! Checking when Jamie, Alex, and Sam are all free this weekend... 🔍" });
+        await agentSay(400, { text: checkingMsg });
         await agentSay(600, {
-          text: "Found it! Here's everyone's availability — tap a slot to pick your window:",
+          text: "Found it! Here's availability — tap a slot to pick your window:",
           cardType: 'availability',
         });
       })();
     }
-  }, [addMsg, agentSay, initialMessage, draftData]);
+  }, [addMsg, agentSay, initialMessage, draftData, people]);
 
   const handleSlotSelect = useCallback((slot) => {
     if (stepRef.current !== 'awaiting_slot') return;
@@ -415,7 +431,7 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate, on
 
     (async () => {
       await agentSay(300, {
-        text: `${slot.day} ${slot.time.split(' – ')[0]} it is! 🙌 Planning a ${activity.name.toLowerCase()} with Jamie, Alex, and Sam. Pulling up options that match everyone's taste...`,
+        text: `${slot.day} ${slot.time.split(' – ')[0]} it is! 🙌 Planning a ${activity?.name.toLowerCase() ?? 'hangout'} with ${formatNames(people)}. Pulling up options that match everyone's taste...`,
       });
       await agentSay(700, {
         text: "Here are my top picks — tap one to lock it in:",
@@ -570,6 +586,7 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate, on
               onQuickReply={handleQuickReply}
               slotRef={slotRef}
               venueRef={venueRef}
+              people={people}
             />
           ));
         })()}

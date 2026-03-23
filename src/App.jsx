@@ -10,17 +10,22 @@ import FriendsScreen from './FriendsScreen';
 import ComingUpScreen from './ComingUpScreen';
 import EventChatScreen from './EventChatScreen';
 import SettingsScreen from './SettingsScreen';
+import WhosFreeScreen from './WhosFreeScreen';
+import FreeChatScreen from './FreeChatScreen';
 
 function App() {
   const [screen, setScreen] = useState('splash');
   const [userData, setUserData] = useState({});
   const [agentMessage, setAgentMessage] = useState(null);
+  const [agentPeople, setAgentPeople] = useState(null);
   const [currentDraft, setCurrentDraft] = useState(null);
   const [drafts, setDrafts] = useState([]);
   const [currentEvent, setCurrentEvent] = useState(null);
+  const [freeChatFriend, setFreeChatFriend] = useState(null);
 
-  const openAgent = (msg) => {
+  const openAgent = (msg, people) => {
     setAgentMessage(msg);
+    setAgentPeople(people || null);
     setCurrentDraft(null);
     setScreen('agent');
   };
@@ -95,6 +100,7 @@ function App() {
         {screen === 'agent' && (
           <AgentChatScreen
             initialMessage={agentMessage}
+            people={agentPeople}
             onBack={() => setScreen('home')}
             onNavigate={setScreen}
             onSaveDraft={saveDraft}
@@ -124,6 +130,22 @@ function App() {
           <EventChatScreen
             event={currentEvent}
             onBack={() => setScreen('comingup')}
+          />
+        )}
+        {screen === 'whos-free' && (
+          <WhosFreeScreen
+            onBack={() => setScreen('home')}
+            onOpenChat={(person) => {
+              setFreeChatFriend(person);
+              setScreen('free-chat');
+            }}
+          />
+        )}
+        {screen === 'free-chat' && freeChatFriend && (
+          <FreeChatScreen
+            friend={freeChatFriend}
+            onBack={() => setScreen('whos-free')}
+            onNavigate={setScreen}
           />
         )}
         {screen === 'settings' && (
