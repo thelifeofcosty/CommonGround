@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import './ComingUpScreen.css';
 import BottomNav from './BottomNav';
 
@@ -64,13 +63,7 @@ function daysUntil(dateStr) {
   return `In ${diff} days`;
 }
 
-export default function ComingUpScreen({ onNavigate, onOpenAgent }) {
-  const [joined, setJoined] = useState({});
-
-  const toggle = (id) => {
-    setJoined(prev => ({ ...prev, [id]: !prev[id] }));
-  };
-
+export default function ComingUpScreen({ onNavigate, onOpenAgent, onOpenEventChat }) {
   return (
     <div className="comingup">
       <div className="comingup__body">
@@ -120,12 +113,14 @@ export default function ComingUpScreen({ onNavigate, onOpenAgent }) {
                     )}
                     <span className="comingup__attendee-count">{ev.attendees.length} going</span>
                   </div>
-                  <button
-                    className={`comingup__join ${joined[ev.id] ? 'comingup__join--active' : ''}`}
-                    onClick={() => toggle(ev.id)}
-                  >
-                    {joined[ev.id] ? "✓ I'm in" : "I'm coming"}
-                  </button>
+                  <div className="comingup__actions">
+                    <button
+                      className="comingup__chat"
+                      onClick={() => onOpenEventChat && onOpenEventChat(ev)}
+                    >
+                      💬 Chat
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

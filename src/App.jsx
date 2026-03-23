@@ -8,6 +8,7 @@ import HomeScreen from './HomeScreen';
 import AgentChatScreen from './AgentChatScreen';
 import FriendsScreen from './FriendsScreen';
 import ComingUpScreen from './ComingUpScreen';
+import EventChatScreen from './EventChatScreen';
 import SettingsScreen from './SettingsScreen';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
   const [agentMessage, setAgentMessage] = useState(null);
   const [currentDraft, setCurrentDraft] = useState(null);
   const [drafts, setDrafts] = useState([]);
+  const [currentEvent, setCurrentEvent] = useState(null);
 
   const openAgent = (msg) => {
     setAgentMessage(msg);
@@ -112,6 +114,16 @@ function App() {
           <ComingUpScreen
             onNavigate={setScreen}
             onOpenAgent={openAgent}
+            onOpenEventChat={(event) => {
+              setCurrentEvent(event);
+              setScreen('event-chat');
+            }}
+          />
+        )}
+        {screen === 'event-chat' && currentEvent && (
+          <EventChatScreen
+            event={currentEvent}
+            onBack={() => setScreen('comingup')}
           />
         )}
         {screen === 'settings' && (

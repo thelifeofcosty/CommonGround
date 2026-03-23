@@ -53,6 +53,14 @@ function AvailabilityCard({ onSelect, locked }) {
     <div className="avail-card">
       <div className="avail-card__header">
         <span className="avail-card__title">📅 This weekend</span>
+        <span className="avail-card__legend">
+          {GROUP.map((p, i) => (
+            <span key={p.name} className="avail-legend-item">
+              <span className="avail-legend-dot" style={{ background: p.color }} />
+              {p.name}{i < GROUP.length - 1 ? ' · ' : ''}
+            </span>
+          ))}
+        </span>
         <div className="avail-card__avatars">
           {GROUP.map(p => <Avatar key={p.name} initial={p.initial} color={p.color} size={22} />)}
         </div>
@@ -483,8 +491,8 @@ export default function AgentChatScreen({ initialMessage, onBack, onNavigate, on
   };
 
   const handleBack = () => {
-    // Show exit dialog if there's any progress to save (not just initial states)
-    if (step !== 'idle' && step !== 'awaiting_slot') {
+    // Show exit dialog if there's any progress to save (not just initial states or completed bookings)
+    if (step !== 'idle' && step !== 'awaiting_slot' && step !== 'done') {
       setShowExitDialog(true);
     } else {
       onBack();

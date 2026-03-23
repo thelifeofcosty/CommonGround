@@ -163,6 +163,31 @@
   margin-left: 6px;
 }
 
+.comingup__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.comingup__chat {
+  background: #25D366;
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.3);
+}
+
+.comingup__chat:hover {
+  background: #128C7E;
+  box-shadow: 0 3px 12px rgba(37, 211, 102, 0.4);
+}
+
 .comingup__join {
   background: #f2ede8;
   color: #6a6460;
