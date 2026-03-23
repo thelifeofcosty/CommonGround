@@ -13,7 +13,7 @@
   },
   "scripts": {
     "start": "NODE_OPTIONS=\"--no-deprecation\" vite",
-    "build": "vite build --outDir public",
+    "build": "vite build",
     "test": "vitest",
     "preview": "vite preview"
   },
