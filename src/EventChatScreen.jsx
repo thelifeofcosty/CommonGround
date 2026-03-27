@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import './EventChatScreen.css';
+import { PEOPLE_PHOTOS, photoStyle } from './people';
 
 const SAMPLE_MESSAGES = {
   1: [
@@ -91,9 +92,11 @@ export default function EventChatScreen({ event, onBack }) {
               <div className="event-chat__sender">
                 <span
                   className="event-chat__sender-avatar"
-                  style={{ background: SENDER_COLORS[msg.sender] }}
+                  style={{ background: PEOPLE_PHOTOS[msg.sender] ? 'transparent' : SENDER_COLORS[msg.sender], overflow: 'hidden' }}
                 >
-                  {msg.sender[0]}
+                  {PEOPLE_PHOTOS[msg.sender]
+                    ? <img src={PEOPLE_PHOTOS[msg.sender]} alt={msg.sender} style={photoStyle} />
+                    : msg.sender[0]}
                 </span>
                 <span className="event-chat__sender-name">{msg.sender}</span>
               </div>

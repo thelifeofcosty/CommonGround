@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import './HomeScreen.css';
 import BottomNav from './BottomNav';
+import { PEOPLE_PHOTOS, photoStyle } from './people';
 
 function SendIcon() {
   return (
@@ -9,6 +10,14 @@ function SendIcon() {
     </svg>
   );
 }
+
+const UNSEEN_FRIENDS = [
+  { name: 'Jamie',  initial: 'J', color: '#996699', lastSeen: '3 weeks ago' },
+  { name: 'Alex',   initial: 'A', color: '#FF9933', lastSeen: 'last month' },
+  { name: 'Priya',  initial: 'P', color: '#CC88AA', lastSeen: '2 weeks ago' },
+  { name: 'Sam',    initial: 'S', color: '#AFCE65', lastSeen: '5 weeks ago' },
+  { name: 'Jordan', initial: 'J', color: '#FF6B6B', lastSeen: 'last month' },
+];
 
 export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate, drafts = [], onLoadDraft, onDeleteDraft }) {
   const [query, setQuery] = useState('');
@@ -57,13 +66,25 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
           </button>
         </div>
 
-        <div className="home__nudge" onClick={() => launchAgent("Plan something with Jamie — it's been 3 weeks!", [{ name: 'Jamie', initial: 'J', color: '#996699' }])}>
-          <div className="home__nudge-avatar">J</div>
-          <div className="home__nudge-body">
-            <p className="home__nudge-text">
-              It's been 3 weeks since you saw <strong>Jamie</strong>. Want to make a plan?
-            </p>
-            <button className="home__nudge-cta">Let's go →</button>
+        <div className="home__unseen">
+          <p className="home__unseen-title">Friends you haven't seen in a while...</p>
+          <div className="home__unseen-scroll">
+            {UNSEEN_FRIENDS.map(f => {
+              const photo = PEOPLE_PHOTOS[f.name];
+              return (
+                <button
+                  key={f.name}
+                  className="home__unseen-card"
+                  onClick={() => launchAgent(`Plan something with ${f.name}!`, [{ name: f.name, initial: f.initial, color: f.color }])}
+                >
+                  <div className="home__unseen-photo" style={{ background: photo ? 'transparent' : f.color, overflow: 'hidden' }}>
+                    {photo ? <img src={photo} alt={f.name} style={photoStyle} /> : f.initial}
+                  </div>
+                  <span className="home__unseen-name">{f.name}</span>
+                  <span className="home__unseen-time">{f.lastSeen}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 

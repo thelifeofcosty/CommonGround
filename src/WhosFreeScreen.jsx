@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './WhosFreeScreen.css';
+import { PEOPLE_PHOTOS, photoStyle } from './people';
 
 const FRIENDS = [
   { id: 'f1', name: 'Alex Rivera',  initial: 'A', color: '#FF9933' },
@@ -55,15 +56,18 @@ export default function WhosFreeScreen({ onBack, onOpenChat }) {
           <Spinner />
           <p className="wf-loading__text">Sending a ping to your friends…</p>
           <div className="wf-loading__avatars">
-            {FRIENDS.map((f, i) => (
-              <div
-                key={f.id}
-                className="wf-loading__avatar"
-                style={{ background: f.color, animationDelay: `${i * 0.15}s` }}
-              >
-                {f.initial}
-              </div>
-            ))}
+            {FRIENDS.map((f, i) => {
+              const photo = PEOPLE_PHOTOS[f.name];
+              return (
+                <div
+                  key={f.id}
+                  className="wf-loading__avatar"
+                  style={{ background: photo ? 'transparent' : f.color, animationDelay: `${i * 0.15}s`, overflow: 'hidden' }}
+                >
+                  {photo ? <img src={photo} alt={f.name} style={photoStyle} /> : f.initial}
+                </div>
+              );
+            })}
           </div>
         </div>
       ) : (
@@ -79,8 +83,8 @@ export default function WhosFreeScreen({ onBack, onOpenChat }) {
                 key={r.id}
                 className={['wf-row', visible.includes(r.id) ? 'wf-row--visible' : ''].join(' ')}
               >
-                <div className="wf-row__avatar" style={{ background: r.color }}>
-                  {r.initial}
+                <div className="wf-row__avatar" style={{ background: PEOPLE_PHOTOS[r.name] ? 'transparent' : r.color, overflow: 'hidden' }}>
+                  {PEOPLE_PHOTOS[r.name] ? <img src={PEOPLE_PHOTOS[r.name]} alt={r.name} style={photoStyle} /> : r.initial}
                 </div>
                 <span className="wf-row__name">{r.name}</span>
                 <button

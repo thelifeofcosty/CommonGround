@@ -1,5 +1,6 @@
 import './ComingUpScreen.css';
 import BottomNav from './BottomNav';
+import { PEOPLE_PHOTOS, photoStyle } from './people';
 
 const SAMPLE_EVENTS = [
   {
@@ -96,16 +97,19 @@ export default function ComingUpScreen({ onNavigate, onOpenAgent, onOpenEventCha
 
                 <div className="comingup__card-bottom">
                   <div className="comingup__avatars">
-                    {ev.attendees.slice(0, 4).map((name, i) => (
-                      <div
-                        key={i}
-                        className="comingup__avatar"
-                        style={{ background: ['#996699','#AFCE65','#FF9933','#7cb9e8'][i % 4], zIndex: 10 - i }}
-                        title={name}
-                      >
-                        {name[0]}
-                      </div>
-                    ))}
+                    {ev.attendees.slice(0, 4).map((name, i) => {
+                      const photo = PEOPLE_PHOTOS[name];
+                      return (
+                        <div
+                          key={i}
+                          className="comingup__avatar"
+                          style={{ background: photo ? 'transparent' : ['#996699','#AFCE65','#FF9933','#7cb9e8'][i % 4], zIndex: 10 - i, overflow: 'hidden' }}
+                          title={name}
+                        >
+                          {photo ? <img src={photo} alt={name} style={photoStyle} /> : name[0]}
+                        </div>
+                      );
+                    })}
                     {ev.attendees.length > 4 && (
                       <div className="comingup__avatar comingup__avatar--more">
                         +{ev.attendees.length - 4}

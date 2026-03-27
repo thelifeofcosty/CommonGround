@@ -2,12 +2,16 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import logoMark from './logo.png';
 import './FreeChatScreen.css';
 import BottomNav from './BottomNav';
+import { PEOPLE_PHOTOS, photoStyle } from './people';
 
 // ── Typing indicator ──────────────────────────────────
-function TypingIndicator({ avatar, color }) {
+function TypingIndicator({ name, color }) {
+  const photo = PEOPLE_PHOTOS[name];
   return (
     <div className="fc-row">
-      <div className="fc-avatar" style={{ background: color }}>{avatar}</div>
+      <div className="fc-avatar" style={{ background: photo ? 'transparent' : color, overflow: 'hidden' }}>
+        {photo ? <img src={photo} alt={name} style={photoStyle} /> : name?.[0]}
+      </div>
       <div className="fc-typing"><span /><span /><span /></div>
     </div>
   );
@@ -245,8 +249,8 @@ export default function FreeChatScreen({ friend, onBack, onNavigate }) {
       <div className="fc-header">
         <button className="fc-header__back" onClick={onBack}>←</button>
         <div className="fc-header__info">
-          <div className="fc-header__avatar" style={{ background: friend.color }}>
-            {friend.initial}
+          <div className="fc-header__avatar" style={{ background: PEOPLE_PHOTOS[friend.name] ? 'transparent' : friend.color, overflow: 'hidden' }}>
+            {PEOPLE_PHOTOS[friend.name] ? <img src={PEOPLE_PHOTOS[friend.name]} alt={friend.name} style={photoStyle} /> : friend.initial}
           </div>
           <div>
             <p className="fc-header__name">{friend.name}</p>
@@ -274,9 +278,12 @@ export default function FreeChatScreen({ friend, onBack, onNavigate }) {
           }
 
           if (msg.type === 'friend') {
+            const friendPhoto = PEOPLE_PHOTOS[friend.name];
             return (
               <div key={msg.id} className="fc-row">
-                <div className="fc-avatar" style={{ background: friend.color }}>{friend.initial}</div>
+                <div className="fc-avatar" style={{ background: friendPhoto ? 'transparent' : friend.color, overflow: 'hidden' }}>
+                  {friendPhoto ? <img src={friendPhoto} alt={friend.name} style={photoStyle} /> : friend.initial}
+                </div>
                 <div className="fc-friend-bubble">{msg.text}</div>
               </div>
             );
@@ -315,7 +322,7 @@ export default function FreeChatScreen({ friend, onBack, onNavigate }) {
         })}
 
         {isTypingAgent  && <AgentTyping />}
-        {isTypingFriend && <TypingIndicator avatar={friend.initial} color={friend.color} />}
+        {isTypingFriend && <TypingIndicator name={friend.name} color={friend.color} />}
       </div>
 
       {/* Input */}

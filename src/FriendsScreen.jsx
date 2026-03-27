@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import './FriendsScreen.css';
 import BottomNav from './BottomNav';
+import { PEOPLE_PHOTOS, photoStyle } from './people';
 
 // ── Mock data ─────────────────────────────────────────
 const PENDING = [
@@ -57,10 +58,11 @@ const SEARCH_POOL = [
 ];
 
 // ── Small reusables ───────────────────────────────────
-function CircleAvatar({ initial, color, size = 46 }) {
+function CircleAvatar({ initial, color, size = 46, name }) {
+  const photo = name && PEOPLE_PHOTOS[name];
   return (
-    <div className="circle-avatar" style={{ width: size, height: size, background: color, fontSize: size * 0.41 }}>
-      {initial}
+    <div className="circle-avatar" style={{ width: size, height: size, background: photo ? 'transparent' : color, fontSize: size * 0.41, overflow: 'hidden' }}>
+      {photo ? <img src={photo} alt={name} style={photoStyle} /> : initial}
     </div>
   );
 }
@@ -69,12 +71,15 @@ function StackedAvatars({ members }) {
   const shown = members.slice(0, 3);
   return (
     <div className="stacked-avatars">
-      {shown.map((m, i) => (
-        <div key={m.name} className="stacked-avatar"
-          style={{ background: m.color, zIndex: shown.length - i, marginLeft: i > 0 ? -12 : 0 }}>
-          {m.initial}
-        </div>
-      ))}
+      {shown.map((m, i) => {
+        const photo = m.name && PEOPLE_PHOTOS[m.name];
+        return (
+          <div key={m.name} className="stacked-avatar"
+            style={{ background: photo ? 'transparent' : m.color, zIndex: shown.length - i, marginLeft: i > 0 ? -12 : 0, overflow: 'hidden' }}>
+            {photo ? <img src={photo} alt={m.name} style={photoStyle} /> : m.initial}
+          </div>
+        );
+      })}
       {members.length > 3 && (
         <div className="stacked-avatar stacked-avatar--more"
           style={{ zIndex: 0, marginLeft: -12 }}>
@@ -161,7 +166,7 @@ function ContactRow({ contact, onOpenGroup, onRemove, onBlock }) {
         <div className="contact-row__avatar">
           {isGroup
             ? <StackedAvatars members={contact.members} />
-            : <CircleAvatar initial={contact.initial} color={contact.color} />
+            : <CircleAvatar initial={contact.initial} color={contact.color} name={contact.name} />
           }
         </div>
         <div className="contact-row__body">
@@ -192,7 +197,7 @@ function PendingCard({ requests, onAccept, onDecline }) {
       </p>
       {requests.map(r => (
         <div key={r.id} className="pending-row">
-          <CircleAvatar initial={r.initial} color={r.color} size={40} />
+          <CircleAvatar initial={r.initial} color={r.color} size={40} name={r.name} />
           <div className="pending-row__info">
             <span className="pending-row__name">{r.name}</span>
             <span className="pending-row__mutual">{r.mutual} mutual friends</span>
@@ -276,7 +281,7 @@ function AddSheet({ onClose, allContacts }) {
               <div className="sheet__results">
                 {results.map(p => (
                   <div key={p.id} className="sheet__result-row">
-                    <CircleAvatar initial={p.initial} color={p.color} size={40} />
+                    <CircleAvatar initial={p.initial} color={p.color} size={40} name={p.name} />
                     <div className="sheet__result-info">
                       <span className="sheet__result-name">{p.name}</span>
                       <span className="sheet__result-mutual">{p.mutual} mutual friends</span>
@@ -321,7 +326,7 @@ function AddSheet({ onClose, allContacts }) {
                 <div className="sheet__members-wrap">
                   {selectedMembers.map(m => (
                     <div key={m.id} className="sheet__member-pill">
-                      <CircleAvatar initial={m.initial} color={m.color} size={22} />
+                      <CircleAvatar initial={m.initial} color={m.color} size={22} name={m.name} />
                       <span>{m.name.split(' ')[0]}</span>
                       <button onClick={() => toggleMember(m)}>×</button>
                     </div>
@@ -343,7 +348,7 @@ function AddSheet({ onClose, allContacts }) {
                 <div className="sheet__results sheet__results--inline">
                   {memberResults.map(p => (
                     <div key={p.id} className="sheet__result-row" onClick={() => toggleMember(p)}>
-                      <CircleAvatar initial={p.initial} color={p.color} size={36} />
+                      <CircleAvatar initial={p.initial} color={p.color} size={36} name={p.name} />
                       <span className="sheet__result-name">{p.name}</span>
                       <div className="sheet__add-circle">+</div>
                     </div>
@@ -417,7 +422,7 @@ function GroupDetail({ group, onClose }) {
           <p className="group-detail__section-label">Members</p>
           {members.map(m => (
             <div key={m.name} className="group-detail__member-row">
-              <CircleAvatar initial={m.initial} color={m.color} size={40} />
+              <CircleAvatar initial={m.initial} color={m.color} size={40} name={m.name} />
               <span className="group-detail__member-name">{m.name}</span>
               <button className="group-detail__remove-btn" onClick={() => removeMember(m)}>
                 Remove
@@ -448,7 +453,7 @@ function GroupDetail({ group, onClose }) {
                 setAddQuery('');
                 setShowAdd(false);
               }}>
-                <CircleAvatar initial={p.initial} color={p.color} size={36} />
+                <CircleAvatar initial={p.initial} color={p.color} size={36} name={p.name} />
                 <span className="sheet__result-name">{p.name}</span>
                 <div className="sheet__add-circle">+</div>
               </div>

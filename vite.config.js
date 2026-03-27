@@ -6,4 +6,8 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  build: {
+    outDir: 'dist',  // explicitly force output to dist
+  },
+  publicDir: 'public',  // keep static assets in public (this is already the default)
 })

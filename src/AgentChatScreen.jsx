@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import logoMark from './logo.png';
 import './AgentChatScreen.css';
 import BottomNav from './BottomNav';
+import { PEOPLE_PHOTOS, photoStyle } from './people';
 
 // ── Default group (used when no people prop is passed) ─
 const DEFAULT_GROUP = [
@@ -23,13 +24,14 @@ function getConfirmDelays(count) {
 }
 
 // ── Tiny avatar ───────────────────────────────────────
-function Avatar({ initial, color, size = 32 }) {
+function Avatar({ initial, color, size = 32, name }) {
+  const photo = name && PEOPLE_PHOTOS[name];
   return (
     <div
       className="mini-avatar"
-      style={{ width: size, height: size, background: color, fontSize: size * 0.42 }}
+      style={{ width: size, height: size, background: photo ? 'transparent' : color, fontSize: size * 0.42, overflow: 'hidden' }}
     >
-      {initial}
+      {photo ? <img src={photo} alt={name} style={photoStyle} /> : initial}
     </div>
   );
 }
@@ -237,7 +239,7 @@ function PeopleConfirmCard({ venue, slot, onAllConfirmed, people }) {
           const confirmed = statuses[i] === 'confirmed';
           return (
             <div key={person.name} className="confirm-row">
-              <Avatar initial={person.initial} color={person.color} size={36} />
+              <Avatar initial={person.initial} color={person.color} size={36} name={person.name} />
               <div className="confirm-row__info">
                 <span className="confirm-row__name">{person.name}</span>
                 <span className={`confirm-row__status ${confirmed ? 'confirm-row__status--ok' : ''}`}>
@@ -277,7 +279,7 @@ function CalendarCard({ venue, slot, people }) {
       <div className="cal-confirm-card__people">
         {people.map(p => (
           <div key={p.name} className="cal-confirm-person">
-            <Avatar initial={p.initial} color={p.color} size={30} />
+            <Avatar initial={p.initial} color={p.color} size={30} name={p.name} />
             <span className="cal-confirm-person__name">{p.name}</span>
             <span className="cal-confirm-person__status">✓ Added</span>
           </div>
