@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import './HomeScreen.css';
 import BottomNav from './BottomNav';
 import { PEOPLE_PHOTOS, photoStyle } from './people';
@@ -31,6 +31,57 @@ const UNSEEN_FRIENDS = [
 export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate, drafts = [], onLoadDraft, onDeleteDraft }) {
   const [query, setQuery] = useState('');
   const [activeTab, setActiveTab] = useState('plans');
+  const unseenScrollRef = useRef(null);
+  const venuesScrollRef = useRef(null);
+
+  useEffect(() => {
+    function makeAutoScroll(ref, speed) {
+      const el = ref.current;
+      if (!el) return () => {};
+      let paused = false;
+      let rafId;
+      let last = null;
+
+      const step = (ts) => {
+        if (!paused) {
+          if (last !== null) {
+            el.scrollLeft += speed * (ts - last);
+            if (el.scrollLeft >= el.scrollWidth / 2) {
+              el.scrollLeft -= el.scrollWidth / 2;
+            }
+          }
+          last = ts;
+        } else {
+          last = null;
+        }
+        rafId = requestAnimationFrame(step);
+      };
+
+      rafId = requestAnimationFrame(step);
+
+      const pause = () => { paused = true; };
+      const resume = () => { setTimeout(() => { paused = false; }, 800); };
+
+      el.addEventListener('touchstart', pause, { passive: true });
+      el.addEventListener('touchend', resume, { passive: true });
+      el.addEventListener('touchcancel', resume, { passive: true });
+      el.addEventListener('mouseenter', pause);
+      el.addEventListener('mouseleave', resume);
+
+      return () => {
+        cancelAnimationFrame(rafId);
+        el.removeEventListener('touchstart', pause);
+        el.removeEventListener('touchend', resume);
+        el.removeEventListener('touchcancel', resume);
+        el.removeEventListener('mouseenter', pause);
+        el.removeEventListener('mouseleave', resume);
+      };
+    }
+
+    const cleanupUnseen = makeAutoScroll(unseenScrollRef, 0.03);
+    const cleanupVenues = makeAutoScroll(venuesScrollRef, 0.025);
+    return () => { cleanupUnseen(); cleanupVenues(); };
+  }, []);
 
   const firstName = userName.split(' ')[0];
 
@@ -77,7 +128,7 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
 
         <div className="home__unseen">
           <p className="home__unseen-title">Friends you haven't seen in a while...</p>
-          <div className="home__unseen-scroll">
+          <div className="home__unseen-scroll" ref={unseenScrollRef}>
             <div className="home__unseen-track">
               {[...UNSEEN_FRIENDS, ...UNSEEN_FRIENDS].map((f, i) => {
                 const photo = PEOPLE_PHOTOS[f.name];
@@ -101,7 +152,7 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
 
         <div className="home__venues">
           <p className="home__venues-title">Discover something new...</p>
-          <div className="home__venues-scroll">
+          <div className="home__venues-scroll" ref={venuesScrollRef}>
             <div className="home__venues-track">
               {[...NEARBY_VENUES, ...NEARBY_VENUES].map((v, i) => (
                 <button key={`${v.id}-${i}`} className="home__venues-card" onClick={() => launchAgent(null, null, v.name)}>
