@@ -34,8 +34,8 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
 
   const firstName = userName.split(' ')[0];
 
-  const launchAgent = (msg, people) => {
-    if (onOpenAgent) onOpenAgent(msg || null, people || null);
+  const launchAgent = (msg, people, venueContext) => {
+    if (onOpenAgent) onOpenAgent(msg || null, people || null, venueContext || null);
   };
 
   return (
@@ -104,7 +104,7 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
           <div className="home__venues-scroll">
             <div className="home__venues-track">
               {[...NEARBY_VENUES, ...NEARBY_VENUES].map((v, i) => (
-                <div key={`${v.id}-${i}`} className="home__venues-card">
+                <button key={`${v.id}-${i}`} className="home__venues-card" onClick={() => launchAgent(null, null, v.name)}>
                   <div className="home__venues-photo">
                     <img src={v.photo} alt={v.name} />
                     {v.sponsored && <span className="home__venues-sponsored">Sponsored</span>}
@@ -118,7 +118,7 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
                       {v.distance}
                     </span>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </div>

@@ -340,7 +340,7 @@ function MessageRow({ msg, onSlotSelect, onVenueSelect, onQuickReply,
 }
 
 // ── Main screen ───────────────────────────────────────
-export default function AgentChatScreen({ initialMessage, people: peopleProp, onBack, onNavigate, onSaveDraft, onDeleteCurrentDraft, draftData }) {
+export default function AgentChatScreen({ initialMessage, people: peopleProp, venueContext, onBack, onNavigate, onSaveDraft, onDeleteCurrentDraft, draftData }) {
   const people = peopleProp || DEFAULT_GROUP;
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -391,6 +391,15 @@ export default function AgentChatScreen({ initialMessage, people: peopleProp, on
       setConfirmationsSent(draftData.confirmationsSent || false);
       if (draftData.slot) slotRef.current = draftData.slot;
       if (draftData.venue) venueRef.current = draftData.venue;
+    } else if (venueContext) {
+      // Venue card tap: agent speaks first with contextual opening
+      setConfirmationsSent(false);
+      setStep('venue_awaiting_who');
+      (async () => {
+        await agentSay(300, {
+          text: `Great pick — ${venueContext} looks fun! Who do you want to go with? You can name a friend or pick a group.`,
+        });
+      })();
     } else {
       // Start new conversation
       setConfirmationsSent(false);
@@ -410,7 +419,7 @@ export default function AgentChatScreen({ initialMessage, people: peopleProp, on
         });
       })();
     }
-  }, [addMsg, agentSay, initialMessage, draftData, people]);
+  }, [addMsg, agentSay, initialMessage, venueContext, draftData, people]);
 
   const handleSlotSelect = useCallback((slot) => {
     if (stepRef.current !== 'awaiting_slot') return;
@@ -505,7 +514,26 @@ export default function AgentChatScreen({ initialMessage, people: peopleProp, on
     if (!text) return;
     addMsg({ type: 'user', text });
     setInputText('');
-    agentSay(500, { text: "Got it! Let me factor that in..." });
+
+    if (stepRef.current === 'venue_awaiting_who') {
+      setStep('venue_awaiting_when');
+      (async () => {
+        await agentSay(500, {
+          text: "Got it — when were you thinking? I can check everyone's availability and find a time that works.",
+        });
+      })();
+    } else if (stepRef.current === 'venue_awaiting_when') {
+      setStep('awaiting_slot');
+      (async () => {
+        await agentSay(400, { text: "On it! Checking availability... 🔍" });
+        await agentSay(600, {
+          text: "Found it! Here's availability — tap a slot to pick your window:",
+          cardType: 'availability',
+        });
+      })();
+    } else {
+      agentSay(500, { text: "Got it! Let me factor that in..." });
+    }
   };
 
   const handleBack = () => {

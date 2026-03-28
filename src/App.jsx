@@ -18,14 +18,16 @@ function App() {
   const [userData, setUserData] = useState({});
   const [agentMessage, setAgentMessage] = useState(null);
   const [agentPeople, setAgentPeople] = useState(null);
+  const [agentVenueContext, setAgentVenueContext] = useState(null);
   const [currentDraft, setCurrentDraft] = useState(null);
   const [drafts, setDrafts] = useState([]);
   const [currentEvent, setCurrentEvent] = useState(null);
   const [freeChatFriend, setFreeChatFriend] = useState(null);
 
-  const openAgent = (msg, people) => {
+  const openAgent = (msg, people, venueContext) => {
     setAgentMessage(msg);
     setAgentPeople(people || null);
+    setAgentVenueContext(venueContext || null);
     setCurrentDraft(null);
     setScreen('agent');
   };
@@ -101,6 +103,7 @@ function App() {
           <AgentChatScreen
             initialMessage={agentMessage}
             people={agentPeople}
+            venueContext={agentVenueContext}
             onBack={() => setScreen('home')}
             onNavigate={setScreen}
             onSaveDraft={saveDraft}
