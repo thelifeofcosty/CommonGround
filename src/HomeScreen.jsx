@@ -127,9 +127,13 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
       };
     }
 
-    const c1 = attachScroller(unseenScrollRef.current, 55);
-    const c2 = attachScroller(venuesScrollRef.current, 70);
-    return () => { c1(); c2(); };
+    let c1 = () => {};
+    let c2 = () => {};
+    const startTimer = setTimeout(() => {
+      c1 = attachScroller(unseenScrollRef.current, 55);
+      c2 = attachScroller(venuesScrollRef.current, 70);
+    }, 300);
+    return () => { clearTimeout(startTimer); c1(); c2(); };
   }, []);
 
   const firstName = userName.split(' ')[0];
