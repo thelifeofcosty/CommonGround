@@ -33,36 +33,30 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
   const [activeTab, setActiveTab] = useState('plans');
   const unseenScrollRef = useRef(null);
   const venuesScrollRef = useRef(null);
+  const unseenTrackRef = useRef(null);
+  const venuesTrackRef = useRef(null);
 
   useEffect(() => {
-    function attachScroller(el, msPerPx) {
-      if (!el) return () => {};
-
-      let paused = false;
-      let resumeTimer = null;
-
-      // ── Auto-scroll ──────────────────────────────────
-      const ticker = setInterval(() => {
-        if (paused) return;
-        el.scrollLeft += 1;
-        if (el.scrollLeft >= el.scrollWidth / 2) {
-          el.scrollLeft -= el.scrollWidth / 2;
-        }
-      }, msPerPx);
+    function attachScroller(scrollEl, trackEl) {
+      if (!scrollEl || !trackEl) return () => {};
 
       const pause = () => {
-        paused = true;
-        if (resumeTimer) clearTimeout(resumeTimer);
+        trackEl.style.animationPlayState = 'paused';
       };
+      const resume = () => {
+        trackEl.style.animationPlayState = 'running';
+      };
+      let resumeTimer = null;
+
       const scheduleResume = () => {
         if (resumeTimer) clearTimeout(resumeTimer);
-        resumeTimer = setTimeout(() => { paused = false; }, 1500);
+        resumeTimer = setTimeout(resume, 1500);
       };
 
-      // ── Touch: browser handles momentum, we just pause ──
-      el.addEventListener('touchstart', pause,          { passive: true });
-      el.addEventListener('touchend',   scheduleResume, { passive: true });
-      el.addEventListener('touchcancel',scheduleResume, { passive: true });
+      // ── Touch: pause animation ──
+      scrollEl.addEventListener('touchstart', pause,          { passive: true });
+      scrollEl.addEventListener('touchend',   scheduleResume, { passive: true });
+      scrollEl.addEventListener('touchcancel',scheduleResume, { passive: true });
 
       // ── Mouse drag ───────────────────────────────────
       let dragging       = false;
@@ -74,10 +68,10 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
         pause();
         dragging        = true;
         dragStartX      = e.clientX;
-        dragStartScroll = el.scrollLeft;
+        dragStartScroll = scrollEl.scrollLeft;
         didDrag         = false;
-        el.style.cursor = 'grabbing';
-        el.style.userSelect = 'none';
+        scrollEl.style.cursor = 'grabbing';
+        scrollEl.style.userSelect = 'none';
       };
 
       const onMouseMove = (e) => {
@@ -86,17 +80,17 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
         if (Math.abs(dx) > 4) didDrag = true;
         let next = dragStartScroll - dx;
         // keep within the loopable range
-        const half = el.scrollWidth / 2;
+        const half = scrollEl.scrollWidth / 2;
         if (next < 0)    next += half;
         if (next >= half) next -= half;
-        el.scrollLeft = next;
+        scrollEl.scrollLeft = next;
       };
 
       const onMouseUp = () => {
         if (!dragging) return;
         dragging = false;
-        el.style.cursor = 'grab';
-        el.style.userSelect = '';
+        scrollEl.style.cursor = 'grab';
+        scrollEl.style.userSelect = '';
         scheduleResume();
       };
 
@@ -107,33 +101,28 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
         if (didDrag) { e.stopPropagation(); didDrag = false; }
       };
 
-      el.addEventListener('mousedown',   onMouseDown);
-      el.addEventListener('mousemove',   onMouseMove);
-      el.addEventListener('mouseup',     onMouseUp);
-      el.addEventListener('mouseleave',  onMouseLeave);
-      el.addEventListener('click',       onClickCapture, true);
+      scrollEl.addEventListener('mousedown',   onMouseDown);
+      scrollEl.addEventListener('mousemove',   onMouseMove);
+      scrollEl.addEventListener('mouseup',     onMouseUp);
+      scrollEl.addEventListener('mouseleave',  onMouseLeave);
+      scrollEl.addEventListener('click',       onClickCapture, true);
 
       return () => {
-        clearInterval(ticker);
         if (resumeTimer) clearTimeout(resumeTimer);
-        el.removeEventListener('touchstart',  pause);
-        el.removeEventListener('touchend',    scheduleResume);
-        el.removeEventListener('touchcancel', scheduleResume);
-        el.removeEventListener('mousedown',   onMouseDown);
-        el.removeEventListener('mousemove',   onMouseMove);
-        el.removeEventListener('mouseup',     onMouseUp);
-        el.removeEventListener('mouseleave',  onMouseLeave);
-        el.removeEventListener('click',       onClickCapture, true);
+        scrollEl.removeEventListener('touchstart',  pause);
+        scrollEl.removeEventListener('touchend',    scheduleResume);
+        scrollEl.removeEventListener('touchcancel', scheduleResume);
+        scrollEl.removeEventListener('mousedown',   onMouseDown);
+        scrollEl.removeEventListener('mousemove',   onMouseMove);
+        scrollEl.removeEventListener('mouseup',     onMouseUp);
+        scrollEl.removeEventListener('mouseleave',  onMouseLeave);
+        scrollEl.removeEventListener('click',       onClickCapture, true);
       };
     }
 
-    let c1 = () => {};
-    let c2 = () => {};
-    const startTimer = setTimeout(() => {
-      c1 = attachScroller(unseenScrollRef.current, 55);
-      c2 = attachScroller(venuesScrollRef.current, 70);
-    }, 300);
-    return () => { clearTimeout(startTimer); c1(); c2(); };
+    let c1 = attachScroller(unseenScrollRef.current, unseenTrackRef.current);
+    let c2 = attachScroller(venuesScrollRef.current, venuesTrackRef.current);
+    return () => { c1(); c2(); };
   }, []);
 
   const firstName = userName.split(' ')[0];
@@ -182,23 +171,43 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
         <div className="home__unseen">
           <p className="home__unseen-title">Friends you haven't seen in a while...</p>
           <div className="home__unseen-scroll" ref={unseenScrollRef}>
-            <div className="home__unseen-track">
-              {[...UNSEEN_FRIENDS, ...UNSEEN_FRIENDS].map((f, i) => {
-                const photo = PEOPLE_PHOTOS[f.name];
-                return (
-                  <button
-                    key={`${f.name}-${i}`}
-                    className="home__unseen-card"
-                    onClick={() => launchAgent(`Plan something with ${f.name}!`, [{ name: f.name, initial: f.initial, color: f.color }])}
-                  >
-                    <div className="home__unseen-photo" style={{ background: photo ? 'transparent' : f.color, overflow: 'hidden' }}>
-                      {photo ? <img src={photo} alt={f.name} style={photoStyle} /> : f.initial}
-                    </div>
-                    <span className="home__unseen-name">{f.name}</span>
-                    <span className="home__unseen-time">{f.lastSeen}</span>
-                  </button>
-                );
-              })}
+            <div className="home__unseen-track scroll-unseen" ref={unseenTrackRef}>
+              <div className="unseen-set">
+                {UNSEEN_FRIENDS.map((f, i) => {
+                  const photo = PEOPLE_PHOTOS[f.name];
+                  return (
+                    <button
+                      key={`first-${f.name}-${i}`}
+                      className="home__unseen-card"
+                      onClick={() => launchAgent(`Plan something with ${f.name}!`, [{ name: f.name, initial: f.initial, color: f.color }])}
+                    >
+                      <div className="home__unseen-photo" style={{ background: photo ? 'transparent' : f.color, overflow: 'hidden' }}>
+                        {photo ? <img src={photo} alt={f.name} style={photoStyle} loading="eager" /> : f.initial}
+                      </div>
+                      <span className="home__unseen-name">{f.name}</span>
+                      <span className="home__unseen-time">{f.lastSeen}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="unseen-set">
+                {UNSEEN_FRIENDS.map((f, i) => {
+                  const photo = PEOPLE_PHOTOS[f.name];
+                  return (
+                    <button
+                      key={`second-${f.name}-${i}`}
+                      className="home__unseen-card"
+                      onClick={() => launchAgent(`Plan something with ${f.name}!`, [{ name: f.name, initial: f.initial, color: f.color }])}
+                    >
+                      <div className="home__unseen-photo" style={{ background: photo ? 'transparent' : f.color, overflow: 'hidden' }}>
+                        {photo ? <img src={photo} alt={f.name} style={photoStyle} loading="eager" /> : f.initial}
+                      </div>
+                      <span className="home__unseen-name">{f.name}</span>
+                      <span className="home__unseen-time">{f.lastSeen}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -206,24 +215,64 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
         <div className="home__venues">
           <p className="home__venues-title">Discover something new...</p>
           <div className="home__venues-scroll" ref={venuesScrollRef}>
-            <div className="home__venues-track">
-              {[...NEARBY_VENUES, ...NEARBY_VENUES].map((v, i) => (
-                <button key={`${v.id}-${i}`} className="home__venues-card" onClick={() => launchAgent(null, null, v.name)}>
-                  <div className="home__venues-photo">
-                    <img src={v.photo} alt={v.name} />
-                    {v.sponsored && <span className="home__venues-sponsored">Sponsored</span>}
-                  </div>
-                  <div className="home__venues-info">
-                    <span className="home__venues-name">{v.name}</span>
-                    <span className="home__venues-distance">
-                      <svg width="10" height="12" viewBox="0 0 10 13" fill="none">
-                        <path d="M5 0C2.24 0 0 2.24 0 5c0 3.75 5 8 5 8s5-4.25 5-8c0-2.76-2.24-5-5-5zm0 6.5A1.5 1.5 0 1 1 5 3.5a1.5 1.5 0 0 1 0 3z" fill="#AFCE65"/>
-                      </svg>
-                      {v.distance}
-                    </span>
-                  </div>
-                </button>
-              ))}
+            <div className="home__venues-track scroll-venues" ref={venuesTrackRef}>
+              <div className="venues-set">
+                {NEARBY_VENUES.map((v, i) => (
+                  <button key={`first-${v.id}-${i}`} className="home__venues-card" onClick={() => launchAgent(null, null, v.name)}>
+                    <div className="home__venues-photo">
+                      <img src={v.photo} alt={v.name} loading="eager" />
+                      {v.sponsored && <span className="home__venues-sponsored">Sponsored</span>}
+                    </div>
+                    <div className="home__venues-info">
+                      <span className="home__venues-name">{v.name}</span>
+                      <span className="home__venues-distance">
+                        <svg width="10" height="12" viewBox="0 0 10 13" fill="none">
+                          <path d="M5 0C2.24 0 0 2.24 0 5c0 3.75 5 8 5 8s5-4.25 5-8c0-2.76-2.24-5-5-5zm0 6.5A1.5 1.5 0 1 1 5 3.5a1.5 1.5 0 0 1 0 3z" fill="#AFCE65"/>
+                        </svg>
+                        {v.distance}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <div className="venues-set">
+                {NEARBY_VENUES.map((v, i) => (
+                  <button key={`second-${v.id}-${i}`} className="home__venues-card" onClick={() => launchAgent(null, null, v.name)}>
+                    <div className="home__venues-photo">
+                      <img src={v.photo} alt={v.name} loading="eager" />
+                      {v.sponsored && <span className="home__venues-sponsored">Sponsored</span>}
+                    </div>
+                    <div className="home__venues-info">
+                      <span className="home__venues-name">{v.name}</span>
+                      <span className="home__venues-distance">
+                        <svg width="10" height="12" viewBox="0 0 10 13" fill="none">
+                          <path d="M5 0C2.24 0 0 2.24 0 5c0 3.75 5 8 5 8s5-4.25 5-8c0-2.76-2.24-5-5-5zm0 6.5A1.5 1.5 0 1 1 5 3.5a1.5 1.5 0 0 1 0 3z" fill="#AFCE65"/>
+                        </svg>
+                        {v.distance}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <div className="venues-set">
+                {NEARBY_VENUES.map((v, i) => (
+                  <button key={`third-${v.id}-${i}`} className="home__venues-card" onClick={() => launchAgent(null, null, v.name)}>
+                    <div className="home__venues-photo">
+                      <img src={v.photo} alt={v.name} loading="eager" />
+                      {v.sponsored && <span className="home__venues-sponsored">Sponsored</span>}
+                    </div>
+                    <div className="home__venues-info">
+                      <span className="home__venues-name">{v.name}</span>
+                      <span className="home__venues-distance">
+                        <svg width="10" height="12" viewBox="0 0 10 13" fill="none">
+                          <path d="M5 0C2.24 0 0 2.24 0 5c0 3.75 5 8 5 8s5-4.25 5-8c0-2.76-2.24-5-5-5zm0 6.5A1.5 1.5 0 1 1 5 3.5a1.5 1.5 0 0 1 0 3z" fill="#AFCE65"/>
+                        </svg>
+                        {v.distance}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>

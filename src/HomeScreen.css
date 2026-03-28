@@ -195,9 +195,17 @@
 
 .home__unseen-track {
   display: flex;
-  gap: 16px;
-  width: max-content;
   padding-left: 24px;
+  gap: 16px;
+}
+
+.unseen-set {
+  display: flex;
+  gap: 16px;
+}
+
+.unseen-set:nth-child(2) {
+  padding-left: 0;
 }
 
 .home__unseen-card {
@@ -252,6 +260,25 @@
   font-weight: 500;
 }
 
+/* ── Auto-scroll animations ────────────────────────────────── */
+@keyframes scroll-unseen {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% + 12px)); }
+}
+
+.scroll-unseen {
+  animation: scroll-unseen 10s linear infinite;
+}
+
+@keyframes scroll-venues {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-33.33%); }
+}
+
+.scroll-venues {
+  animation: scroll-venues 15s linear infinite;
+}
+
 /* ── Nearby venues ───────────────────────────────────── */
 .home__venues {
   display: flex;
@@ -286,9 +313,18 @@
 
 .home__venues-track {
   display: flex;
-  gap: 14px;
-  width: max-content;
   padding-left: 24px;
+  gap: 14px;
+}
+
+.venues-set {
+  display: flex;
+  gap: 14px;
+}
+
+.venues-set:nth-child(2),
+.venues-set:nth-child(3) {
+  padding-left: 0;
 }
 
 .home__venues-card {
