@@ -35,57 +35,39 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
   const venuesScrollRef = useRef(null);
 
   useEffect(() => {
-    function makeAutoScroll(el, pxPerSec) {
+    function makeAutoScroll(el, msPerPx) {
       if (!el) return () => {};
       let paused = false;
-      let raf;
-      let prev = null;
-      let accum = 0;
 
-      const tick = (now) => {
-        if (!paused) {
-          if (prev !== null) {
-            accum += pxPerSec * (now - prev) / 1000;
-            if (accum >= 1) {
-              const move = Math.floor(accum);
-              accum -= move;
-              el.scrollLeft += move;
-              if (el.scrollLeft >= el.scrollWidth / 2) {
-                el.scrollLeft -= el.scrollWidth / 2;
-              }
-            }
-          }
-          prev = now;
-        } else {
-          prev = null;
-          accum = 0;
+      const timer = setInterval(() => {
+        if (paused) return;
+        el.scrollLeft += 1;
+        if (el.scrollLeft >= el.scrollWidth / 2) {
+          el.scrollLeft -= el.scrollWidth / 2;
         }
-        raf = requestAnimationFrame(tick);
-      };
-
-      raf = requestAnimationFrame(tick);
+      }, msPerPx);
 
       const pause = () => { paused = true; };
       const resume = () => { setTimeout(() => { paused = false; }, 800); };
 
       el.addEventListener('touchstart', pause, { passive: true });
-      el.addEventListener('touchend', resume, { passive: true });
-      el.addEventListener('touchcancel', resume, { passive: true });
+      el.addEventListener('touchend',   resume, { passive: true });
+      el.addEventListener('touchcancel',resume, { passive: true });
       el.addEventListener('mouseenter', pause);
       el.addEventListener('mouseleave', resume);
 
       return () => {
-        cancelAnimationFrame(raf);
+        clearInterval(timer);
         el.removeEventListener('touchstart', pause);
-        el.removeEventListener('touchend', resume);
-        el.removeEventListener('touchcancel', resume);
+        el.removeEventListener('touchend',   resume);
+        el.removeEventListener('touchcancel',resume);
         el.removeEventListener('mouseenter', pause);
         el.removeEventListener('mouseleave', resume);
       };
     }
 
-    const c1 = makeAutoScroll(unseenScrollRef.current, 18);
-    const c2 = makeAutoScroll(venuesScrollRef.current, 14);
+    const c1 = makeAutoScroll(unseenScrollRef.current, 55);  // 1px per 55ms ≈ 18px/s
+    const c2 = makeAutoScroll(venuesScrollRef.current, 70);  // 1px per 70ms ≈ 14px/s
     return () => { c1(); c2(); };
   }, []);
 
