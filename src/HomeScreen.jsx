@@ -35,11 +35,14 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
   const venuesScrollRef = useRef(null);
 
   useEffect(() => {
-    function makeAutoScroll(el, msPerPx) {
+    function attachScroller(el, msPerPx) {
       if (!el) return () => {};
-      let paused = false;
 
-      const timer = setInterval(() => {
+      let paused = false;
+      let resumeTimer = null;
+
+      // ── Auto-scroll ──────────────────────────────────
+      const ticker = setInterval(() => {
         if (paused) return;
         el.scrollLeft += 1;
         if (el.scrollLeft >= el.scrollWidth / 2) {
@@ -47,27 +50,85 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
         }
       }, msPerPx);
 
-      const pause = () => { paused = true; };
-      const resume = () => { setTimeout(() => { paused = false; }, 800); };
+      const pause = () => {
+        paused = true;
+        if (resumeTimer) clearTimeout(resumeTimer);
+      };
+      const scheduleResume = () => {
+        if (resumeTimer) clearTimeout(resumeTimer);
+        resumeTimer = setTimeout(() => { paused = false; }, 1500);
+      };
 
-      el.addEventListener('touchstart', pause, { passive: true });
-      el.addEventListener('touchend',   resume, { passive: true });
-      el.addEventListener('touchcancel',resume, { passive: true });
-      el.addEventListener('mouseenter', pause);
-      el.addEventListener('mouseleave', resume);
+      // ── Touch: browser handles momentum, we just pause ──
+      el.addEventListener('touchstart', pause,          { passive: true });
+      el.addEventListener('touchend',   scheduleResume, { passive: true });
+      el.addEventListener('touchcancel',scheduleResume, { passive: true });
+
+      // ── Mouse drag ───────────────────────────────────
+      let dragging       = false;
+      let dragStartX     = 0;
+      let dragStartScroll= 0;
+      let didDrag        = false;
+
+      const onMouseDown = (e) => {
+        pause();
+        dragging        = true;
+        dragStartX      = e.clientX;
+        dragStartScroll = el.scrollLeft;
+        didDrag         = false;
+        el.style.cursor = 'grabbing';
+        el.style.userSelect = 'none';
+      };
+
+      const onMouseMove = (e) => {
+        if (!dragging) return;
+        const dx = e.clientX - dragStartX;
+        if (Math.abs(dx) > 4) didDrag = true;
+        let next = dragStartScroll - dx;
+        // keep within the loopable range
+        const half = el.scrollWidth / 2;
+        if (next < 0)    next += half;
+        if (next >= half) next -= half;
+        el.scrollLeft = next;
+      };
+
+      const onMouseUp = () => {
+        if (!dragging) return;
+        dragging = false;
+        el.style.cursor = 'grab';
+        el.style.userSelect = '';
+        scheduleResume();
+      };
+
+      const onMouseLeave = () => { if (dragging) onMouseUp(); };
+
+      // Suppress click when the mouse actually dragged
+      const onClickCapture = (e) => {
+        if (didDrag) { e.stopPropagation(); didDrag = false; }
+      };
+
+      el.addEventListener('mousedown',   onMouseDown);
+      el.addEventListener('mousemove',   onMouseMove);
+      el.addEventListener('mouseup',     onMouseUp);
+      el.addEventListener('mouseleave',  onMouseLeave);
+      el.addEventListener('click',       onClickCapture, true);
 
       return () => {
-        clearInterval(timer);
-        el.removeEventListener('touchstart', pause);
-        el.removeEventListener('touchend',   resume);
-        el.removeEventListener('touchcancel',resume);
-        el.removeEventListener('mouseenter', pause);
-        el.removeEventListener('mouseleave', resume);
+        clearInterval(ticker);
+        if (resumeTimer) clearTimeout(resumeTimer);
+        el.removeEventListener('touchstart',  pause);
+        el.removeEventListener('touchend',    scheduleResume);
+        el.removeEventListener('touchcancel', scheduleResume);
+        el.removeEventListener('mousedown',   onMouseDown);
+        el.removeEventListener('mousemove',   onMouseMove);
+        el.removeEventListener('mouseup',     onMouseUp);
+        el.removeEventListener('mouseleave',  onMouseLeave);
+        el.removeEventListener('click',       onClickCapture, true);
       };
     }
 
-    const c1 = makeAutoScroll(unseenScrollRef.current, 55);  // 1px per 55ms ≈ 18px/s
-    const c2 = makeAutoScroll(venuesScrollRef.current, 70);  // 1px per 70ms ≈ 14px/s
+    const c1 = attachScroller(unseenScrollRef.current, 55);
+    const c2 = attachScroller(venuesScrollRef.current, 70);
     return () => { c1(); c2(); };
   }, []);
 

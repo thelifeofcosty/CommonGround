@@ -186,6 +186,7 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
   overscroll-behavior-x: contain;
+  cursor: grab;
 }
 
 .home__unseen-scroll::-webkit-scrollbar {
@@ -276,6 +277,7 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
   overscroll-behavior-x: contain;
+  cursor: grab;
 }
 
 .home__venues-scroll::-webkit-scrollbar {
