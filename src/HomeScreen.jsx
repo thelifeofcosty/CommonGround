@@ -35,29 +35,35 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
   const venuesScrollRef = useRef(null);
 
   useEffect(() => {
-    function makeAutoScroll(ref, speed) {
-      const el = ref.current;
+    function makeAutoScroll(el, pxPerSec) {
       if (!el) return () => {};
       let paused = false;
-      let rafId;
-      let last = null;
+      let raf;
+      let prev = null;
+      let accum = 0;
 
-      const step = (ts) => {
+      const tick = (now) => {
         if (!paused) {
-          if (last !== null) {
-            el.scrollLeft += speed * (ts - last);
-            if (el.scrollLeft >= el.scrollWidth / 2) {
-              el.scrollLeft -= el.scrollWidth / 2;
+          if (prev !== null) {
+            accum += pxPerSec * (now - prev) / 1000;
+            if (accum >= 1) {
+              const move = Math.floor(accum);
+              accum -= move;
+              el.scrollLeft += move;
+              if (el.scrollLeft >= el.scrollWidth / 2) {
+                el.scrollLeft -= el.scrollWidth / 2;
+              }
             }
           }
-          last = ts;
+          prev = now;
         } else {
-          last = null;
+          prev = null;
+          accum = 0;
         }
-        rafId = requestAnimationFrame(step);
+        raf = requestAnimationFrame(tick);
       };
 
-      rafId = requestAnimationFrame(step);
+      raf = requestAnimationFrame(tick);
 
       const pause = () => { paused = true; };
       const resume = () => { setTimeout(() => { paused = false; }, 800); };
@@ -69,7 +75,7 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
       el.addEventListener('mouseleave', resume);
 
       return () => {
-        cancelAnimationFrame(rafId);
+        cancelAnimationFrame(raf);
         el.removeEventListener('touchstart', pause);
         el.removeEventListener('touchend', resume);
         el.removeEventListener('touchcancel', resume);
@@ -78,9 +84,9 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
       };
     }
 
-    const cleanupUnseen = makeAutoScroll(unseenScrollRef, 0.03);
-    const cleanupVenues = makeAutoScroll(venuesScrollRef, 0.025);
-    return () => { cleanupUnseen(); cleanupVenues(); };
+    const c1 = makeAutoScroll(unseenScrollRef.current, 18);
+    const c2 = makeAutoScroll(venuesScrollRef.current, 14);
+    return () => { c1(); c2(); };
   }, []);
 
   const firstName = userName.split(' ')[0];
