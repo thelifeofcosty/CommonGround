@@ -11,6 +11,17 @@ const DEFAULT_GROUP = [
   { name: 'Sam',   initial: 'S', color: '#AFCE65' },
 ];
 
+const AVATAR_COLORS = ['#996699', '#FF9933', '#AFCE65', '#FF6B6B', '#CC88AA', '#6B9FFF'];
+
+function parseNames(text) {
+  const parts = text.split(/,|\band\b|&/i).map(s => s.trim()).filter(Boolean);
+  if (parts.length === 0) return null;
+  return parts.map((raw, i) => {
+    const name = raw.charAt(0).toUpperCase() + raw.slice(1);
+    return { name, initial: name[0], color: AVATAR_COLORS[i % AVATAR_COLORS.length] };
+  });
+}
+
 // Format a list of people into a readable string
 function formatNames(people) {
   if (people.length === 1) return people[0].name;
@@ -341,7 +352,8 @@ function MessageRow({ msg, onSlotSelect, onVenueSelect, onQuickReply,
 
 // ── Main screen ───────────────────────────────────────
 export default function AgentChatScreen({ initialMessage, people: peopleProp, venueContext, onBack, onNavigate, onSaveDraft, onDeleteCurrentDraft, draftData }) {
-  const people = peopleProp || DEFAULT_GROUP;
+  const [people, setPeople] = useState(peopleProp || DEFAULT_GROUP);
+  const peopleRef = useRef(peopleProp || DEFAULT_GROUP);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -419,38 +431,47 @@ export default function AgentChatScreen({ initialMessage, people: peopleProp, ve
         });
       })();
     }
-  }, [addMsg, agentSay, initialMessage, venueContext, draftData, people]);
+  }, [addMsg, agentSay, initialMessage, venueContext, draftData]);
 
   const handleSlotSelect = useCallback((slot) => {
     if (stepRef.current !== 'awaiting_slot') return;
     slotRef.current = slot;
-    setStep('slot_chosen');
     addMsg({ type: 'user', text: `${slot.day} ${slot.time} works for me!` });
 
-    // Auto-determine activity based on time slot
-    let activity;
-    if (slot.time.includes('11 am') || slot.time.includes('2 pm')) {
-      // Lunch time slots
-      activity = { id: 'lunch', name: 'Lunch', emoji: '🥗' };
-    } else if (slot.time.includes('2 – 5 pm')) {
-      // Afternoon slots
-      activity = { id: 'coffee', name: 'Coffee', emoji: '☕' };
-    } else if (slot.time.includes('6 – 9 pm') || slot.time.includes('7 – 10 pm')) {
-      // Evening slots
-      activity = { id: 'dinner', name: 'Dinner', emoji: '🍽️' };
+    if (venueContext) {
+      // Venue already chosen — skip options, go straight to confirmation
+      venueRef.current = { name: venueContext, emoji: '📍' };
+      setStep('awaiting_rsvp');
+      (async () => {
+        await agentSay(400, {
+          text: `${slot.day} it is! 🙌 I'll send the invites to ${formatNames(peopleRef.current)} now.`,
+          cardType: 'people-confirm',
+        });
+        setConfirmationsSent(true);
+      })();
+    } else {
+      setStep('slot_chosen');
+      const currentPeople = peopleRef.current;
+      let activity;
+      if (slot.time.includes('11 am') || slot.time.includes('2 pm')) {
+        activity = { id: 'lunch', name: 'Lunch', emoji: '🥗' };
+      } else if (slot.time.includes('2 – 5 pm')) {
+        activity = { id: 'coffee', name: 'Coffee', emoji: '☕' };
+      } else if (slot.time.includes('6 – 9 pm') || slot.time.includes('7 – 10 pm')) {
+        activity = { id: 'dinner', name: 'Dinner', emoji: '🍽️' };
+      }
+      (async () => {
+        await agentSay(300, {
+          text: `${slot.day} ${slot.time.split(' – ')[0]} it is! 🙌 Planning a ${activity?.name.toLowerCase() ?? 'hangout'} with ${formatNames(currentPeople)}. Pulling up options that match everyone's taste...`,
+        });
+        await agentSay(700, {
+          text: "Here are my top picks — tap one to lock it in:",
+          cardType: 'options',
+        });
+        setStep('awaiting_venue');
+      })();
     }
-
-    (async () => {
-      await agentSay(300, {
-        text: `${slot.day} ${slot.time.split(' – ')[0]} it is! 🙌 Planning a ${activity?.name.toLowerCase() ?? 'hangout'} with ${formatNames(people)}. Pulling up options that match everyone's taste...`,
-      });
-      await agentSay(700, {
-        text: "Here are my top picks — tap one to lock it in:",
-        cardType: 'options',
-      });
-      setStep('awaiting_venue');
-    })();
-  }, [addMsg, agentSay]);
+  }, [addMsg, agentSay, venueContext]);
 
   const handleVenueSelect = useCallback((venue) => {
     if (stepRef.current !== 'awaiting_venue') return;
@@ -516,6 +537,11 @@ export default function AgentChatScreen({ initialMessage, people: peopleProp, ve
     setInputText('');
 
     if (stepRef.current === 'venue_awaiting_who') {
+      const parsed = parseNames(text);
+      if (parsed) {
+        setPeople(parsed);
+        peopleRef.current = parsed;
+      }
       setStep('venue_awaiting_when');
       (async () => {
         await agentSay(500, {
@@ -524,8 +550,12 @@ export default function AgentChatScreen({ initialMessage, people: peopleProp, ve
       })();
     } else if (stepRef.current === 'venue_awaiting_when') {
       setStep('awaiting_slot');
+      const currentPeople = peopleRef.current;
       (async () => {
-        await agentSay(400, { text: "On it! Checking availability... 🔍" });
+        const checkMsg = currentPeople.length === 1
+          ? `On it! Checking when ${currentPeople[0].name} is free... 🔍`
+          : `On it! Checking when ${formatNames(currentPeople)} are all free... 🔍`;
+        await agentSay(400, { text: checkMsg });
         await agentSay(600, {
           text: "Found it! Here's availability — tap a slot to pick your window:",
           cardType: 'availability',

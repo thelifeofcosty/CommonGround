@@ -84,7 +84,11 @@ export default function LoginScreen({ onLogin, onForgotPassword, onGetStarted })
         <button
           className={`login__btn ${email && password ? 'login__btn--active' : ''}`}
           disabled={!email || !password}
-          onClick={() => onLogin({ email, password })}
+          onClick={() => {
+            const raw = email.includes('@') ? email.split('@')[0] : email;
+            const name = raw.charAt(0).toUpperCase() + raw.slice(1);
+            onLogin({ email, password, name });
+          }}
         >
           Log in
         </button>
