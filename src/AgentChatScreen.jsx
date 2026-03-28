@@ -107,11 +107,6 @@ function AvailabilityCard({ onSelect, locked, people }) {
           >
             <span className="avail-slot__day">{slot.day}</span>
             <span className="avail-slot__time">{slot.time}</span>
-            <div className="avail-slot__dots">
-              {people.map((p, i) => (
-                <span key={p.name} className="avail-dot" style={{ background: i < slot.free ? p.color : '#ddd' }} />
-              ))}
-            </div>
           </button>
         ))}
       </div>
