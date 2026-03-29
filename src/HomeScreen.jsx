@@ -21,11 +21,16 @@ const NEARBY_VENUES = [
 ];
 
 const UNSEEN_FRIENDS = [
-  { name: 'Jamie',  initial: 'J', color: '#996699', lastSeen: '3 weeks ago' },
-  { name: 'Alex',   initial: 'A', color: '#FF9933', lastSeen: 'last month' },
-  { name: 'Priya',  initial: 'P', color: '#CC88AA', lastSeen: '2 weeks ago' },
-  { name: 'Sam',    initial: 'S', color: '#AFCE65', lastSeen: '5 weeks ago' },
-  { name: 'Jordan', initial: 'J', color: '#FF6B6B', lastSeen: 'last month' },
+  { name: 'Jamie',         initial: 'J', color: '#996699', lastSeen: '3 weeks ago' },
+  { name: 'Alex',          initial: 'A', color: '#FF9933', lastSeen: 'last month' },
+  { name: 'Maya',          initial: 'M', color: '#CC88AA', lastSeen: '2 weeks ago' },
+  { name: 'Sam',           initial: 'S', color: '#AFCE65', lastSeen: '5 weeks ago' },
+  { name: 'Jordan',        initial: 'J', color: '#FF6B6B', lastSeen: 'last month' },
+  { name: 'Chloe Martin',  initial: 'C', color: '#7CB9E8', lastSeen: '4 weeks ago' },
+  { name: 'Lena Fischer',  initial: 'L', color: '#AFCE65', lastSeen: '6 weeks ago' },
+  { name: 'Marcus Webb',   initial: 'M', color: '#6B9FFF', lastSeen: 'last month' },
+  { name: 'Sofia Andrade', initial: 'S', color: '#FF9933', lastSeen: '3 weeks ago' },
+  { name: 'Tom Nguyen',    initial: 'T', color: '#996699', lastSeen: '2 weeks ago' },
 ];
 
 export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate, drafts = [], onLoadDraft, onDeleteDraft }) {
@@ -33,96 +38,102 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
   const [activeTab, setActiveTab] = useState('plans');
   const unseenScrollRef = useRef(null);
   const venuesScrollRef = useRef(null);
-  const unseenTrackRef = useRef(null);
-  const venuesTrackRef = useRef(null);
 
   useEffect(() => {
-    function attachScroller(scrollEl, trackEl) {
-      if (!scrollEl || !trackEl) return () => {};
+    function attachScroller(el, msPerPx) {
+      if (!el) return () => {};
 
-      const pause = () => {
-        trackEl.style.animationPlayState = 'paused';
-      };
-      const resume = () => {
-        trackEl.style.animationPlayState = 'running';
-      };
+      let paused = false;
       let resumeTimer = null;
 
+      // ── Auto-scroll via setInterval driving scrollLeft ──
+      const ticker = setInterval(() => {
+        if (paused) return;
+        el.scrollLeft += 1;
+        const half = el.scrollWidth / 2;
+        if (el.scrollLeft >= half) el.scrollLeft -= half;
+      }, msPerPx);
+
+      const pause = () => {
+        paused = true;
+        if (resumeTimer) clearTimeout(resumeTimer);
+      };
       const scheduleResume = () => {
         if (resumeTimer) clearTimeout(resumeTimer);
-        resumeTimer = setTimeout(resume, 1500);
+        resumeTimer = setTimeout(() => { paused = false; }, 1500);
       };
 
-      // ── Touch: pause animation ──
-      scrollEl.addEventListener('touchstart', pause,          { passive: true });
-      scrollEl.addEventListener('touchend',   scheduleResume, { passive: true });
-      scrollEl.addEventListener('touchcancel',scheduleResume, { passive: true });
+      // ── Touch: native browser scroll, we just pause/resume ──
+      el.addEventListener('touchstart',  pause,          { passive: true });
+      el.addEventListener('touchend',    scheduleResume, { passive: true });
+      el.addEventListener('touchcancel', scheduleResume, { passive: true });
 
-      // ── Mouse drag ───────────────────────────────────
-      let dragging       = false;
-      let dragStartX     = 0;
-      let dragStartScroll= 0;
-      let didDrag        = false;
+      // ── Mouse drag ──────────────────────────────────────────
+      let dragging        = false;
+      let dragStartX      = 0;
+      let dragStartScroll = 0;
+      let didDrag         = false;
 
       const onMouseDown = (e) => {
         pause();
         dragging        = true;
         dragStartX      = e.clientX;
-        dragStartScroll = scrollEl.scrollLeft;
+        dragStartScroll = el.scrollLeft;
         didDrag         = false;
-        scrollEl.style.cursor = 'grabbing';
-        scrollEl.style.userSelect = 'none';
+        el.style.cursor     = 'grabbing';
+        el.style.userSelect = 'none';
       };
-
       const onMouseMove = (e) => {
         if (!dragging) return;
         const dx = e.clientX - dragStartX;
         if (Math.abs(dx) > 4) didDrag = true;
         let next = dragStartScroll - dx;
-        // keep within the loopable range
-        const half = scrollEl.scrollWidth / 2;
-        if (next < 0)    next += half;
+        const half = el.scrollWidth / 2;
+        if (next < 0)     next += half;
         if (next >= half) next -= half;
-        scrollEl.scrollLeft = next;
+        el.scrollLeft = next;
       };
-
       const onMouseUp = () => {
         if (!dragging) return;
-        dragging = false;
-        scrollEl.style.cursor = 'grab';
-        scrollEl.style.userSelect = '';
+        dragging            = false;
+        el.style.cursor     = 'grab';
+        el.style.userSelect = '';
         scheduleResume();
       };
-
       const onMouseLeave = () => { if (dragging) onMouseUp(); };
 
-      // Suppress click when the mouse actually dragged
+      // Suppress click after a real drag
       const onClickCapture = (e) => {
         if (didDrag) { e.stopPropagation(); didDrag = false; }
       };
 
-      scrollEl.addEventListener('mousedown',   onMouseDown);
-      scrollEl.addEventListener('mousemove',   onMouseMove);
-      scrollEl.addEventListener('mouseup',     onMouseUp);
-      scrollEl.addEventListener('mouseleave',  onMouseLeave);
-      scrollEl.addEventListener('click',       onClickCapture, true);
+      el.addEventListener('mousedown',  onMouseDown);
+      el.addEventListener('mousemove',  onMouseMove);
+      el.addEventListener('mouseup',    onMouseUp);
+      el.addEventListener('mouseleave', onMouseLeave);
+      el.addEventListener('click',      onClickCapture, true);
 
       return () => {
+        clearInterval(ticker);
         if (resumeTimer) clearTimeout(resumeTimer);
-        scrollEl.removeEventListener('touchstart',  pause);
-        scrollEl.removeEventListener('touchend',    scheduleResume);
-        scrollEl.removeEventListener('touchcancel', scheduleResume);
-        scrollEl.removeEventListener('mousedown',   onMouseDown);
-        scrollEl.removeEventListener('mousemove',   onMouseMove);
-        scrollEl.removeEventListener('mouseup',     onMouseUp);
-        scrollEl.removeEventListener('mouseleave',  onMouseLeave);
-        scrollEl.removeEventListener('click',       onClickCapture, true);
+        el.removeEventListener('touchstart',  pause);
+        el.removeEventListener('touchend',    scheduleResume);
+        el.removeEventListener('touchcancel', scheduleResume);
+        el.removeEventListener('mousedown',   onMouseDown);
+        el.removeEventListener('mousemove',   onMouseMove);
+        el.removeEventListener('mouseup',     onMouseUp);
+        el.removeEventListener('mouseleave',  onMouseLeave);
+        el.removeEventListener('click',       onClickCapture, true);
       };
     }
 
-    let c1 = attachScroller(unseenScrollRef.current, unseenTrackRef.current);
-    let c2 = attachScroller(venuesScrollRef.current, venuesTrackRef.current);
-    return () => { c1(); c2(); };
+    let c1 = () => {};
+    let c2 = () => {};
+    const startTimer = setTimeout(() => {
+      c1 = attachScroller(unseenScrollRef.current, 55);
+      c2 = attachScroller(venuesScrollRef.current, 70);
+    }, 300);
+    return () => { clearTimeout(startTimer); c1(); c2(); };
   }, []);
 
   const firstName = userName.split(' ')[0];
@@ -171,7 +182,7 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
         <div className="home__unseen">
           <p className="home__unseen-title">Friends you haven't seen in a while...</p>
           <div className="home__unseen-scroll" ref={unseenScrollRef}>
-            <div className="home__unseen-track scroll-unseen" ref={unseenTrackRef}>
+            <div className="home__unseen-track scroll-unseen">
               <div className="unseen-set">
                 {UNSEEN_FRIENDS.map((f, i) => {
                   const photo = PEOPLE_PHOTOS[f.name];
@@ -215,7 +226,7 @@ export default function HomeScreen({ userName = 'Rose', onOpenAgent, onNavigate,
         <div className="home__venues">
           <p className="home__venues-title">Discover something new...</p>
           <div className="home__venues-scroll" ref={venuesScrollRef}>
-            <div className="home__venues-track scroll-venues" ref={venuesTrackRef}>
+            <div className="home__venues-track scroll-venues">
               <div className="venues-set">
                 {NEARBY_VENUES.map((v, i) => (
                   <button key={`first-${v.id}-${i}`} className="home__venues-card" onClick={() => launchAgent(null, null, v.name)}>
