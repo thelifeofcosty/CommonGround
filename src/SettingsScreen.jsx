@@ -3,6 +3,66 @@ import './SettingsScreen.css';
 
 const INTERESTS = ['Food & Drinks', 'Outdoors', 'Culture', 'Nightlife', 'Live Music', 'Sports', 'Art', 'Gaming'];
 const DIETARY = ['Vegetarian', 'Vegan', 'Halal', 'Kosher', 'Gluten-free', 'Dairy-free'];
+const CALENDAR_PROVIDERS = [
+  { id: 'icloud', name: 'iCloud', subtitle: 'Apple iCloud' },
+  { id: 'exchange', name: 'Microsoft Exchange', subtitle: 'Exchange' },
+  { id: 'google', name: 'Google', subtitle: 'Google Calendar' },
+  { id: 'yahoo', name: 'Yahoo!', subtitle: 'Yahoo Mail' },
+  { id: 'aol', name: 'AOL.', subtitle: 'AOL Mail' },
+  { id: 'outlook', name: 'Outlook.com', subtitle: 'Outlook' },
+];
+
+function ProviderIcon({ id }) {
+  switch (id) {
+    case 'icloud':
+      return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M17.5 15.5c1.3 0 2.4-1.1 2.4-2.4 0-1.2-.9-2.2-2.1-2.4-.2-1.4-1.4-2.5-2.9-2.5-1.2 0-2.3.7-2.7 1.7-1-.5-2.1-.2-2.8.7-.8 1-1 2.3-.5 3.5-1 .2-1.8 1-1.8 2.1 0 1.2 1 2.2 2.2 2.2h8.2Z" fill="#1D1D1F"/>
+        </svg>
+      );
+    case 'exchange':
+      return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="2" width="20" height="20" rx="7" fill="#0078D4"/>
+          <path d="M7 8h10v2H7V8Zm0 4h7v2H7v-2Zm0 4h10v2H7v-2Z" fill="#fff"/>
+        </svg>
+      );
+    case 'google':
+      return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 11.5v3.5h5.2c-.2 1.1-.8 2.1-1.7 2.8l2.5 2.1C19.7 19.2 21 16.5 21 13.5c0-.8-.1-1.5-.3-2.2H12Z" fill="#4285F4"/>
+          <path d="M6.5 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2L4 8.7C3.5 9.9 3.2 11.2 3.2 12.5c0 1.3.3 2.6.8 3.8L6.5 14Z" fill="#FBBC05"/>
+          <path d="M12 5.5c1.3 0 2.4.5 3.2 1.3l2.4-2.4C16.9 3 14.6 2 12 2 8.9 2 6.1 3.4 4.4 5.7l2.4 1.9C7.7 7 9.7 5.5 12 5.5Z" fill="#34A853"/>
+          <path d="M17.7 16.6c-.7.5-1.6.8-2.7.8-2.3 0-4.3-1.5-5-3.6L4.4 12.5c.3.9.8 1.7 1.5 2.3 1 1.1 2.4 1.8 4.1 1.8 1.3 0 2.4-.4 3.3-1l3.4 1.9Z" fill="#EA4335"/>
+        </svg>
+      );
+    case 'yahoo':
+      return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" fill="#6001D2"/>
+          <path d="M7.3 7.8L12 12.2l4.7-4.4 1.6 1.7-4.3 4.1 4.3 4.1-1.6 1.7-4.7-4.4-4.7 4.4-1.6-1.7 4.3-4.1-4.3-4.1 1.6-1.7Z" fill="#fff"/>
+        </svg>
+      );
+    case 'aol':
+      return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" fill="#000"/>
+          <path d="M8 7h3.5c1.7 0 2.5.8 2.5 2.3 0 1.2-.6 1.9-1.7 2.1L15 14.5H11.2V16H7.8V7Zm3 3.6c.7 0 1.1-.3 1.1-.9 0-.5-.4-.8-1-.8H8.7v1.7H11Z" fill="#fff"/>
+          <circle cx="17.5" cy="16.5" r="1" fill="#fff"/>
+        </svg>
+      );
+    case 'outlook':
+      return (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="2" width="20" height="20" rx="6" fill="#0078D4"/>
+          <path d="M7 7h10v10H7V7Z" fill="#fff"/>
+          <path d="M7 9.5l5 2 5-2v-1H7v1Zm0 4.5v4h10v-4l-5 2-5-2Z" fill="#0078D4"/>
+        </svg>
+      );
+    default:
+      return <span />;
+  }
+}
 
 function BackIcon() {
   return (
@@ -37,6 +97,35 @@ function SectionLabel({ children }) {
   return <div className="settings__section-label">{children}</div>;
 }
 
+function ProviderSelection({ onSelect, onAddOther }) {
+  return (
+    <div className="settings__provider-body">
+      <div className="settings__provider-intro">Choose your provider</div>
+      <div className="settings__provider-list">
+        {CALENDAR_PROVIDERS.map(provider => (
+          <button
+            key={provider.id}
+            className="settings__provider-card"
+            onClick={() => onSelect(provider)}
+          >
+            <span className="settings__provider-icon"><ProviderIcon id={provider.id} /></span>
+            <div className="settings__provider-copy">
+              <span className="settings__provider-name">{provider.name}</span>
+              <span className="settings__provider-subtitle">{provider.subtitle}</span>
+            </div>
+          </button>
+        ))}
+        <button className="settings__provider-card settings__provider-card--other" onClick={onAddOther}>
+          <span className="settings__provider-icon">+</span>
+          <div className="settings__provider-copy">
+            <span className="settings__provider-name">Add Other Account…</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function SettingsScreen({ onBack, userName = 'Rose', userEmail = 'rose@example.com' }) {
   const firstName = userName.split(' ')[0];
 
@@ -57,6 +146,7 @@ export default function SettingsScreen({ onBack, userName = 'Rose', userEmail = 
   const [calendars, setCalendars] = useState([
     { id: 'google', name: 'Google Calendar', emoji: '📅' },
   ]);
+  const [showProviderPicker, setShowProviderPicker] = useState(false);
 
   // Privacy
   const [profilePublic, setProfilePublic] = useState(true);
@@ -84,20 +174,37 @@ export default function SettingsScreen({ onBack, userName = 'Rose', userEmail = 
   const setNotif = (key, val) => setNotifs(prev => ({ ...prev, [key]: val }));
   const setFriend = (key, val) => setFriendsSee(prev => ({ ...prev, [key]: val }));
 
+  const openProviderPicker = () => setShowProviderPicker(true);
+  const closeProviderPicker = () => setShowProviderPicker(false);
+  const connectProvider = (provider) => {
+    setCalendars(prev => {
+      if (prev.some(c => c.id === provider.id)) return prev;
+      return [...prev, { id: provider.id, name: provider.name, emoji: provider.emoji }];
+    });
+    setShowProviderPicker(false);
+  };
+
   return (
     <div className="settings">
       {/* Header */}
       <div className="settings__header">
-        <button className="settings__back" onClick={onBack}>
+        <button className="settings__back" onClick={showProviderPicker ? closeProviderPicker : onBack}>
           <BackIcon />
         </button>
-        <h1 className="settings__title">Settings</h1>
+        <h1 className="settings__title">{showProviderPicker ? 'Add Account' : 'Settings'}</h1>
         <div style={{ width: 38 }} />
       </div>
 
       <div className="settings__body">
+        {showProviderPicker ? (
+          <ProviderSelection
+            onSelect={connectProvider}
+            onAddOther={closeProviderPicker}
+          />
+        ) : (
+          <>
 
-        {/* ── PROFILE ─────────────────────────────────── */}
+            {/* ── PROFILE ─────────────────────────────────── */}
         <SectionLabel>Profile</SectionLabel>
         <div className="settings__card">
 
@@ -258,7 +365,7 @@ export default function SettingsScreen({ onBack, userName = 'Rose', userEmail = 
             </div>
           ))}
           <div className="settings__row">
-            <button className="settings__text-btn settings__text-btn--green">+ Connect another calendar</button>
+            <button className="settings__text-btn settings__text-btn--green" onClick={openProviderPicker}>+ Connect another calendar</button>
           </div>
         </div>
 
@@ -334,6 +441,8 @@ export default function SettingsScreen({ onBack, userName = 'Rose', userEmail = 
         </div>
 
         <div style={{ height: 32 }} />
+          </>
+        )}
       </div>
     </div>
   );
