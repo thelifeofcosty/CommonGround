@@ -4,6 +4,8 @@ import './AgentChatScreen.css';
 import BottomNav from './BottomNav';
 import { PEOPLE_PHOTOS, photoStyle } from './people';
 
+const SYSTEM_PROMPT = `You are CommonGround's planning assistant — warm, concise, and focused on helping users coordinate social plans. You help friends find the right time, pick great venues, and turn vague plans into real ones. Keep responses short (1–3 sentences), conversational, and action-oriented. You're embedded in a planning app where structured actions like checking availability, picking venues, and sending invites are handled by the UI — respond naturally to questions and free-form messages. Never list options or repeat UI information already shown.`;
+
 // ── Default group (used when no people prop is passed) ─
 const DEFAULT_GROUP = [
   { name: 'Jamie', initial: 'J', color: '#996699' },
@@ -345,6 +347,42 @@ function MessageRow({ msg, onSlotSelect, onVenueSelect, onQuickReply,
   );
 }
 
+// ── Venue detection & Google Places ──────────────────
+function isVenueQuery(text) {
+  return /restaurant|bar|cafe|coffee|pub|food|eat|drink|venue|place|suggest|recommend|where (should|can) (we|i)|find (a|some)|looking for|what.s (good|near|around)|activit|things? to do|night ?out|brunch|dinner|lunch/i.test(text);
+}
+
+async function fetchPlaces(query) {
+  const key = import.meta.env.VITE_GOOGLE_PLACES_API_KEY;
+  if (!key) return [];
+  try {
+    const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': key,
+        'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.rating,places.currentOpeningHours,places.priceLevel,places.editorialSummary',
+      },
+      body: JSON.stringify({ textQuery: query }),
+    });
+    const data = await res.json();
+    return data.places?.slice(0, 5) || [];
+  } catch (err) {
+    console.error('Google Places error:', err);
+    return [];
+  }
+}
+
+function formatPlacesForContext(places) {
+  const lines = places.slice(0, 3).map((p, i) => {
+    const name    = p.displayName?.text || 'Unknown';
+    const address = p.formattedAddress || '';
+    const rating  = p.rating ? `⭐ ${p.rating}` : '';
+    return `${i + 1}. ${name} — ${address}${rating ? ' · ' + rating : ''}`;
+  });
+  return `Real venues from Google Places:\n${lines.join('\n')}`;
+}
+
 // ── Main screen ───────────────────────────────────────
 export default function AgentChatScreen({ initialMessage, people: peopleProp, venueContext, onBack, onNavigate, onSaveDraft, onDeleteCurrentDraft, draftData }) {
   const [people, setPeople] = useState(peopleProp || DEFAULT_GROUP);
@@ -355,11 +393,12 @@ export default function AgentChatScreen({ initialMessage, people: peopleProp, ve
   const [inputText, setInputText] = useState('');
   const [step, setStep]           = useState('idle');
   const [confirmationsSent, setConfirmationsSent] = useState(false);
-  const stepRef    = useRef('idle');
-  const slotRef    = useRef(null);
-  const venueRef   = useRef(null);
-  const scrollRef  = useRef(null);
-  const startedRef = useRef(false);
+  const stepRef        = useRef('idle');
+  const slotRef        = useRef(null);
+  const venueRef       = useRef(null);
+  const scrollRef      = useRef(null);
+  const startedRef     = useRef(false);
+  const apiMessagesRef = useRef([]);
 
   stepRef.current = step;
 
@@ -371,19 +410,70 @@ export default function AgentChatScreen({ initialMessage, people: peopleProp, ve
 
   const addMsg = useCallback((msg) => {
     setMessages(prev => [...prev, { id: `${Date.now()}-${Math.random()}`, ...msg }]);
+    if (msg.type === 'user' && msg.text) {
+      apiMessagesRef.current = [...apiMessagesRef.current, { role: 'user', content: msg.text }];
+    }
   }, []);
 
-  const agentSay = useCallback((waitMs, msg) => {
+  const agentSay = useCallback((waitMs, msg, uiOnly = false) => {
     return new Promise(resolve => {
       setTimeout(() => {
         setIsTyping(true);
         setTimeout(() => {
           setIsTyping(false);
           setMessages(prev => [...prev, { id: `${Date.now()}-${Math.random()}`, type: 'agent', ...msg }]);
+          if (!uiOnly && msg.text) {
+            apiMessagesRef.current = [...apiMessagesRef.current, { role: 'assistant', content: msg.text }];
+          }
           resolve();
         }, 1100);
       }, waitMs);
     });
+  }, []);
+
+  const callClaude = useCallback(async (userText) => {
+    const msgId = `${Date.now()}-${Math.random()}`;
+    setIsTyping(false);
+    setMessages(prev => [...prev, { id: msgId, type: 'agent', text: '' }]);
+
+    // Fetch real venue data if the user is asking for suggestions
+    let systemPrompt = SYSTEM_PROMPT;
+    if (userText && isVenueQuery(userText)) {
+      const places = await fetchPlaces(userText);
+      if (places.length > 0) {
+        systemPrompt += '\n\n' + formatPlacesForContext(places);
+      }
+    }
+
+    try {
+      console.log('[Claude] system prompt length:', systemPrompt.length, '| messages count:', apiMessagesRef.current.length);
+
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true"
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1024,
+          system: systemPrompt,
+          messages: apiMessagesRef.current
+        })
+      });
+      const data = await response.json();
+      const reply = data.content[0].text;
+
+      setMessages(prev => prev.map(m => m.id === msgId ? { ...m, text: reply } : m));
+      apiMessagesRef.current = [...apiMessagesRef.current, { role: 'assistant', content: reply }];
+    } catch (err) {
+      console.error('[Claude] API error:', err);
+      console.error('[Claude] error details:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
+      const fallback = "Sorry, I'm having trouble connecting right now. Please try again!";
+      setMessages(prev => prev.map(m => m.id === msgId ? { ...m, text: fallback } : m));
+    }
   }, []);
 
   // Start conversation once
@@ -405,13 +495,13 @@ export default function AgentChatScreen({ initialMessage, people: peopleProp, ve
       (async () => {
         await agentSay(300, {
           text: `Great pick — ${venueContext} looks fun! Who do you want to go with? You can name a friend or pick a group.`,
-        });
+        }, true);
       })();
     } else {
-      // Start new conversation
+      // Start new conversation — display messages in UI only, don't populate apiMessagesRef
       setConfirmationsSent(false);
       const first = initialMessage || `Hey, I want to plan something with ${formatNames(people)}`;
-      addMsg({ type: 'user', text: first });
+      setMessages(prev => [...prev, { id: `${Date.now()}-${Math.random()}`, type: 'user', text: first }]);
       setStep('awaiting_slot');
 
       const checkingMsg = people.length === 1
@@ -419,11 +509,11 @@ export default function AgentChatScreen({ initialMessage, people: peopleProp, ve
         : `On it! Checking when ${formatNames(people)} are all free this week... 🔍`;
 
       (async () => {
-        await agentSay(400, { text: checkingMsg });
+        await agentSay(400, { text: checkingMsg }, true);
         await agentSay(600, {
           text: "Found it! Here's availability — tap a slot to pick your window:",
           cardType: 'availability',
-        });
+        }, true);
       })();
     }
   }, [addMsg, agentSay, initialMessage, venueContext, draftData]);
@@ -557,7 +647,7 @@ export default function AgentChatScreen({ initialMessage, people: peopleProp, ve
         });
       })();
     } else {
-      agentSay(500, { text: "Got it! Let me factor that in..." });
+      callClaude(text);
     }
   };
 

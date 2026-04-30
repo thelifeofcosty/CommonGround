@@ -15,48 +15,82 @@ const CALENDAR_PROVIDERS = [
 function ProviderIcon({ id }) {
   switch (id) {
     case 'icloud':
+      // Apple Mail blue envelope icon
       return (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M17.5 15.5c1.3 0 2.4-1.1 2.4-2.4 0-1.2-.9-2.2-2.1-2.4-.2-1.4-1.4-2.5-2.9-2.5-1.2 0-2.3.7-2.7 1.7-1-.5-2.1-.2-2.8.7-.8 1-1 2.3-.5 3.5-1 .2-1.8 1-1.8 2.1 0 1.2 1 2.2 2.2 2.2h8.2Z" fill="#1D1D1F"/>
+          <rect width="24" height="24" rx="5.5" fill="#1C8EF9"/>
+          <path d="M4.5 8h15v10h-15V8z" fill="white"/>
+          <path d="M4.5 8l7.5 5.5L19.5 8H4.5z" fill="#D6EAFF"/>
+          <path d="M4.5 8l7.5 5.5L19.5 8" stroke="#B8D8F8" strokeWidth="0.6" fill="none"/>
         </svg>
       );
     case 'exchange':
+      // Microsoft Exchange icon — blue with stylized E/X shape
       return (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <rect x="2" y="2" width="20" height="20" rx="7" fill="#0078D4"/>
-          <path d="M7 8h10v2H7V8Zm0 4h7v2H7v-2Zm0 4h10v2H7v-2Z" fill="#fff"/>
+          <rect width="24" height="24" rx="5.5" fill="#0F6CBD"/>
+          {/* E body */}
+          <rect x="4" y="4" width="9" height="16" rx="1.5" fill="#28A8E0"/>
+          {/* E cutouts to form the E shape */}
+          <rect x="7" y="7.5" width="5.5" height="2.5" rx="0.5" fill="#0F6CBD"/>
+          <rect x="7" y="14" width="5.5" height="2.5" rx="0.5" fill="#0F6CBD"/>
+          {/* Crossing bar */}
+          <rect x="10" y="8" width="10" height="8" rx="1.5" fill="#50B0E8" opacity="0.85"/>
+          <rect x="12" y="10.5" width="5.5" height="2.5" rx="0.5" fill="#0F6CBD" opacity="0.6"/>
         </svg>
       );
     case 'google':
+      // Gmail multicolor M envelope icon (official Gmail SVG scaled to 24x24)
       return (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M12 11.5v3.5h5.2c-.2 1.1-.8 2.1-1.7 2.8l2.5 2.1C19.7 19.2 21 16.5 21 13.5c0-.8-.1-1.5-.3-2.2H12Z" fill="#4285F4"/>
-          <path d="M6.5 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2L4 8.7C3.5 9.9 3.2 11.2 3.2 12.5c0 1.3.3 2.6.8 3.8L6.5 14Z" fill="#FBBC05"/>
-          <path d="M12 5.5c1.3 0 2.4.5 3.2 1.3l2.4-2.4C16.9 3 14.6 2 12 2 8.9 2 6.1 3.4 4.4 5.7l2.4 1.9C7.7 7 9.7 5.5 12 5.5Z" fill="#34A853"/>
-          <path d="M17.7 16.6c-.7.5-1.6.8-2.7.8-2.3 0-4.3-1.5-5-3.6L4.4 12.5c.3.9.8 1.7 1.5 2.3 1 1.1 2.4 1.8 4.1 1.8 1.3 0 2.4-.4 3.3-1l3.4 1.9Z" fill="#EA4335"/>
+        <svg width="24" height="24" viewBox="52 42 88 66" fill="none">
+          <path fill="#4285F4" d="M58 108h14V74L52 59v43c0 3.32 2.69 6 6 6"/>
+          <path fill="#34A853" d="M120 108h14c3.32 0 6-2.69 6-6V59l-20 15"/>
+          <path fill="#FBBC04" d="M120 48v26l20-15v-8c0-7.42-8.47-11.65-14.4-7.2"/>
+          <path fill="#EA4335" d="M72 74V48l24 18 24-18v26L96 92"/>
+          <path fill="#C5221F" d="M52 51v8l20 15V48l-5.6-4.2c-5.94-4.45-14.4-.22-14.4 7.2"/>
         </svg>
       );
     case 'yahoo':
+      // Yahoo Mail purple rounded square with envelope and yahoo! text
       return (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" fill="#6001D2"/>
-          <path d="M7.3 7.8L12 12.2l4.7-4.4 1.6 1.7-4.3 4.1 4.3 4.1-1.6 1.7-4.7-4.4-4.7 4.4-1.6-1.7 4.3-4.1-4.3-4.1 1.6-1.7Z" fill="#fff"/>
+          <defs>
+            <linearGradient id="yahooGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#7B2FBE"/>
+              <stop offset="100%" stopColor="#5C18A4"/>
+            </linearGradient>
+          </defs>
+          <rect width="24" height="24" rx="5.5" fill="url(#yahooGrad)"/>
+          <rect x="4" y="5.5" width="16" height="10" rx="1.5" fill="white"/>
+          <path d="M4 7l8 5.5L20 7" stroke="#7B2FBE" strokeWidth="1.3" fill="none"/>
+          <text x="12" y="22" fontSize="5" fontWeight="800" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif">yahoo!</text>
         </svg>
       );
     case 'aol':
+      // AOL Mail — envelope with AOL text overlay
       return (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" fill="#000"/>
-          <path d="M8 7h3.5c1.7 0 2.5.8 2.5 2.3 0 1.2-.6 1.9-1.7 2.1L15 14.5H11.2V16H7.8V7Zm3 3.6c.7 0 1.1-.3 1.1-.9 0-.5-.4-.8-1-.8H8.7v1.7H11Z" fill="#fff"/>
-          <circle cx="17.5" cy="16.5" r="1" fill="#fff"/>
+          <rect width="24" height="24" rx="3" fill="#F0F4FF"/>
+          <path d="M2 6h20v14H2V6z" fill="#E8EEF8"/>
+          <path d="M2 6l10 8L22 6H2z" fill="#B0BEE0"/>
+          <path d="M2 6l10 8L22 6" stroke="#8A9DC0" strokeWidth="0.5" fill="none"/>
+          <text x="12" y="17" fontSize="6.5" fontWeight="900" fill="#2A4FA8" textAnchor="middle" fontFamily="Arial, sans-serif">AOL.</text>
         </svg>
       );
     case 'outlook':
+      // Outlook icon — blue background, white O letter, calendar grid
       return (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <rect x="2" y="2" width="20" height="20" rx="6" fill="#0078D4"/>
-          <path d="M7 7h10v10H7V7Z" fill="#fff"/>
-          <path d="M7 9.5l5 2 5-2v-1H7v1Zm0 4.5v4h10v-4l-5 2-5-2Z" fill="#0078D4"/>
+          <rect width="24" height="24" rx="5.5" fill="#0F6CBD"/>
+          {/* White O */}
+          <circle cx="9" cy="13" r="5" fill="white"/>
+          <circle cx="9" cy="13" r="3" fill="#0F6CBD"/>
+          {/* Calendar grid (right side) */}
+          <rect x="15" y="5" width="7" height="7" rx="1" fill="white"/>
+          <rect x="16" y="6.5" width="2" height="1.2" rx="0.3" fill="#0F6CBD"/>
+          <rect x="19" y="6.5" width="2" height="1.2" rx="0.3" fill="#0F6CBD"/>
+          <rect x="16" y="9" width="2" height="1.2" rx="0.3" fill="#0F6CBD"/>
+          <rect x="19" y="9" width="2" height="1.2" rx="0.3" fill="#0F6CBD"/>
         </svg>
       );
     default:
